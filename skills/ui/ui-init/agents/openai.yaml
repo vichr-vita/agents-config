@@ -1,0 +1,6 @@
+interface:
+  display_name: "UI init"
+  short_description: "Initialize project design context and screenshot review"
+  default_prompt: "Use $ui-init to initialize the image-first UI workflow in this project while preserving existing instructions and design decisions."
+policy:
+  allow_implicit_invocation: false

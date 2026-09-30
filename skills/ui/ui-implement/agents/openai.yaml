@@ -1,0 +1,6 @@
+interface:
+  display_name: "UI implement"
+  short_description: "Implement a UI image with screenshot review and correction"
+  default_prompt: "Use $ui-implement to implement the selected UI image, inspect and correct browser screenshots against it, and save the final PNG previews for review."
+policy:
+  allow_implicit_invocation: false
