@@ -30,13 +30,6 @@
       "path": "skills/engineering/wayfinder"
     },
     {
-      "name": "setup-matt-pocock-skills",
-      "category": "workflow",
-      "url": "https://github.com/mattpocock/skills.git",
-      "commit": "959a8e9f1edc3adbe2f7e3054bb6fbefa6696260",
-      "path": "skills/engineering/setup-matt-pocock-skills"
-    },
-    {
       "name": "prototype",
       "category": "workflow",
       "url": "https://github.com/mattpocock/skills.git",
@@ -126,6 +119,13 @@
       "url": "https://github.com/leonardomso/rust-skills.git",
       "commit": "fd2a861ab0406a4ac536a55274d14ea6fd1ca9c9",
       "path": "."
+    },
+    {
+      "name": "cloudflare",
+      "category": "infrastructure",
+      "url": "https://github.com/cloudflare/skills.git",
+      "commit": "41e0d19858946d18af9ee2c2feebbe2e11d829ff",
+      "path": "skills/cloudflare"
     }
   ]
 }
