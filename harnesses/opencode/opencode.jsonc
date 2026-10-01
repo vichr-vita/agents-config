@@ -18,5 +18,19 @@
       }
     }
   },
-  "permission": "allow"
+  "permission": {
+    "*": "allow",
+    "nibomo_*": "deny"
+  },
+  "mcp": {
+    "nibomo": {
+      "type": "remote",
+      "url": "https://vichr-rbpi5.tailb8724c.ts.net:10443/v1/mcp",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {file:~/.config/opencode/nibomo-mcp-key}"
+      }
+    }
+  }
 }

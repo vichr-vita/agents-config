@@ -108,6 +108,7 @@ def main() -> int:
     check(codex_home.joinpath("agents/adversarial-reviewer.toml").exists(), "Codex reviewer is installed")
     check(opencode_home.joinpath("agents/adversarial-reviewer.md").exists(), "OpenCode reviewer is installed")
     check(opencode_home.joinpath("agents/computer-use.md").exists(), "OpenCode computer-use agent is installed")
+    check(opencode_home.joinpath("agents/Nibomo.md").exists(), "OpenCode Nibomo agent is installed")
     if not args.pre_cleanup:
         check(not codex_home.joinpath("agents/implementer.toml").exists(), "retired Codex implementer is absent")
         check(not codex_home.joinpath("agents/qa.toml").exists(), "retired Codex QA agent is absent")

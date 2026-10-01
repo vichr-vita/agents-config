@@ -36,7 +36,13 @@ Run `./scripts/verify.sh` after installation. Set the `AGENTS_CONFIG_*` home var
 
 ## Managed and local files
 
-The repository manages global instructions, shared skills, the adversarial reviewer, the OpenCode computer-use agent, and OpenCode's model configuration. It does not manage credentials, sessions, caches, databases, Codex UI settings, trusted hashes, or the rest of `~/.codex/config.toml`.
+The repository manages global instructions, shared skills, the adversarial reviewer, the OpenCode computer-use and Nibomo agents, and OpenCode's model and MCP configuration. It does not manage credentials, sessions, caches, databases, Codex UI settings, trusted hashes, or the rest of `~/.codex/config.toml`.
+
+### Nibomo
+
+`Nibomo` is a primary agent with full tool permissions and access to the private Pi's Nibomo MCP. Other installed agents deny `nibomo_*` tools. Agents that override all permissions with `"*": "allow"` must also end their permission rules with `nibomo_*: deny` unless they are `Nibomo`.
+
+Keep the administrator-issued MCP key in `~/.config/opencode/nibomo-mcp-key`, with file permissions `0600`. OpenCode reads this unmanaged credential file when it loads the configuration. The Pi must run Nibomo with local MCP enabled. Connect through Tailscale, then select `Nibomo` in OpenCode or run `opencode --agent Nibomo`. Restart OpenCode after installation.
 
 External sources use exact Git commits. Locally authored skills remain in this repository. `skills/provenance.md` records how each source was classified during the migration.
 
