@@ -46,6 +46,8 @@ Keep the administrator-issued MCP key in `~/.config/opencode/nibomo-mcp-key`, wi
 
 External sources use exact Git commits. Locally authored skills remain in this repository. `skills/provenance.md` records how each source was classified during the migration.
 
+Taste Skill, Web Design Guidelines, Awesome Design MD, and Image-to-Code are saved under `skills/ui/` and installed for both harnesses. Awesome Design MD includes the reference library. Their upstream commits and local adaptations are recorded in `skills/provenance.md`.
+
 ## Legacy cleanup
 
 `./scripts/cleanup-legacy.sh --dry-run` lists the retired Caveman and Babysitter paths. The cleanup script runs the replacement-layout gate itself, then creates a timestamped archive before removing anything. Run `./scripts/verify.sh` afterward for the final acceptance check.
