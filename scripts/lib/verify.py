@@ -59,24 +59,15 @@ def render(template: Path, prompt: Path) -> str:
 
 def main() -> int:
     args = parse_args()
-    lock = json.loads((REPO / "skills/sources.lock.json").read_text())
-    check(lock.get("version") == 1, "external source lock schema")
-    external_names: set[str] = set()
-    for source in lock["sources"]:
-        check(bool(re.fullmatch(r"[0-9a-f]{40}", source["commit"])), f"pinned commit for {source['name']}")
-        check(source["name"] not in external_names, f"unique locked skill {source['name']}")
-        external_names.add(source["name"])
-
-    owned_skills: dict[str, Path] = {}
+    skills: dict[str, Path] = {}
     skill_ids: set[str] = set()
     for skill in sorted((REPO / "skills").glob("*/*/SKILL.md")):
         directory_name = skill.parent.name
-        check(directory_name not in owned_skills, f"unique owned directory {directory_name}")
-        owned_skills[directory_name] = skill
+        check(directory_name not in skills, f"unique skill directory {directory_name}")
+        skills[directory_name] = skill
         values = frontmatter(skill)
         check(values["name"] not in skill_ids, f"unique skill ID {values['name']}")
         skill_ids.add(values["name"])
-    check(not (set(owned_skills) & external_names), "owned and external names do not overlap")
 
     opencode = REPO / "harnesses/opencode/opencode.jsonc"
     json.loads(strip_jsonc(opencode.read_text()))
@@ -113,14 +104,7 @@ def main() -> int:
         check(not codex_home.joinpath("agents/implementer.toml").exists(), "retired Codex implementer is absent")
         check(not codex_home.joinpath("agents/qa.toml").exists(), "retired Codex QA agent is absent")
     installed_ids: set[str] = set()
-    for source in lock["sources"]:
-        if source["name"] not in state.get("exclusions", []):
-            installed_skill = shared_home / "skills" / source["name"] / "SKILL.md"
-            check(installed_skill.exists(), f"external skill is installed {source['name']}")
-            values = frontmatter(installed_skill)
-            check(values["name"] not in installed_ids, f"unique installed skill ID {values['name']}")
-            installed_ids.add(values["name"])
-    for name, source_skill in owned_skills.items():
+    for name, source_skill in skills.items():
         if name not in state.get("exclusions", []):
             install_root = skill_install_root(
                 skill_harnesses(source_skill),
@@ -129,7 +113,7 @@ def main() -> int:
                 shared_home=shared_home,
             )
             installed_skill = install_root / name / "SKILL.md"
-            check(installed_skill.exists(), f"owned skill is installed {name}")
+            check(installed_skill.exists(), f"skill is installed {name}")
             values = frontmatter(installed_skill)
             check(values["name"] not in installed_ids, f"unique installed skill ID {values['name']}")
             installed_ids.add(values["name"])

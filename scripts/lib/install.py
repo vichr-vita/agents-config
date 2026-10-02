@@ -9,11 +9,9 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import tarfile
 import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from io import BytesIO
 
 from skill_metadata import skill_harnesses, skill_install_root
 
@@ -90,42 +88,6 @@ def render(template: Path, prompt: Path) -> str:
     return text.replace(marker, prompt.read_text().rstrip())
 
 
-def materialize_external(source: dict[str, str], cache: Path, dry_run: bool) -> Path | None:
-    name = source["name"]
-    commit = source["commit"]
-    target = cache / "skills" / name / commit
-    if (target / "SKILL.md").is_file():
-        return target
-    if dry_run:
-        print(f"FETCH   {name} at {commit[:12]}")
-        return None
-
-    repo_key = hashlib.sha256(source["url"].encode()).hexdigest()[:16]
-    mirror = cache / "repos" / f"{repo_key}.git"
-    mirror.parent.mkdir(parents=True, exist_ok=True)
-    if not mirror.exists():
-        run("git", "clone", "--bare", "--filter=blob:none", source["url"], str(mirror))
-    try:
-        run("git", "cat-file", "-e", f"{commit}^{{commit}}", cwd=mirror)
-    except subprocess.CalledProcessError:
-        run("git", "fetch", "--no-tags", "origin", commit, cwd=mirror)
-
-    archive_args = ["git", "archive", commit]
-    if source["path"] != ".":
-        archive_args.append(source["path"])
-    archive = subprocess.run(archive_args, cwd=mirror, check=True, stdout=subprocess.PIPE).stdout
-    target.parent.mkdir(parents=True, exist_ok=True)
-    work = Path(tempfile.mkdtemp(prefix=f".{name}.", dir=target.parent))
-    with tarfile.open(fileobj=BytesIO(archive)) as bundle:
-        bundle.extractall(work, filter="data")
-    extracted = work if source["path"] == "." else work / source["path"]
-    shutil.copytree(extracted, target)
-    shutil.rmtree(work)
-    if not (target / "SKILL.md").is_file():
-        raise RuntimeError(f"locked source has no SKILL.md: {name}")
-    return target
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Install unified Codex and OpenCode configuration.")
     mode = parser.add_mutually_exclusive_group(required=True)
@@ -164,22 +126,16 @@ def main() -> int:
     require_writable(shared_home, "shared agent home")
     require_writable(state_home, "installer state home")
     require_writable(backup_home, "backup home")
-    lock = json.loads((REPO / "skills/sources.lock.json").read_text())
     exclusions = set(args.exclude)
 
-    owned: dict[str, Path] = {}
+    skills: dict[str, Path] = {}
     for skill_file in sorted((REPO / "skills").glob("*/*/SKILL.md")):
         name = skill_file.parent.name
-        if name in owned:
-            raise RuntimeError(f"duplicate owned skill directory: {name}")
-        owned[name] = skill_file.parent
+        if name in skills:
+            raise RuntimeError(f"duplicate skill directory: {name}")
+        skills[name] = skill_file.parent
 
-    externals = {item["name"]: item for item in lock["sources"]}
-    duplicates = set(owned) & set(externals)
-    if duplicates:
-        raise RuntimeError(f"skills are both owned and external: {', '.join(sorted(duplicates))}")
-    known = set(owned) | set(externals)
-    unknown_exclusions = exclusions - known
+    unknown_exclusions = exclusions - set(skills)
     if unknown_exclusions:
         raise RuntimeError(f"unknown excluded skill: {', '.join(sorted(unknown_exclusions))}")
 
@@ -213,7 +169,7 @@ def main() -> int:
         ]
     )
 
-    for name, source in owned.items():
+    for name, source in skills.items():
         if name not in exclusions:
             install_root = skill_install_root(
                 skill_harnesses(source / "SKILL.md"),
@@ -221,15 +177,7 @@ def main() -> int:
                 opencode_home=opencode_home,
                 shared_home=shared_home,
             )
-            artifacts.append(Artifact(install_root / name, source, f"owned-skill:{name}", revision))
-    for name, source in externals.items():
-        if name in exclusions:
-            continue
-        materialized = materialize_external(source, state_home / "cache", args.dry_run)
-        if materialized is not None:
-            artifacts.append(Artifact(shared_home / "skills" / name, materialized, f"external-skill:{name}", source["commit"]))
-        else:
-            print(f"INSTALL {shared_home / 'skills' / name}")
+            artifacts.append(Artifact(install_root / name, source, f"skill:{name}", revision))
 
     previous = {entry["target"]: entry for entry in json.loads(state_file.read_text()).get("targets", [])} if state_file.exists() else {}
     desired_targets = {str(item.target) for item in artifacts}

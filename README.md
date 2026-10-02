@@ -2,9 +2,9 @@
 
 This repository is the editable source for configuration shared by Codex and OpenCode.
 
-Shared instructions live in `AGENTS.md`. Owned skills live under `skills/` in human-readable categories, while externally maintained skills are pinned in `skills/sources.lock.json`. The installer exposes global skills through the flat `~/.agents/skills` directory and writes only the adapter files each harness understands.
+Shared instructions live in `AGENTS.md`. All skills and their supporting files live under `skills/` in human-readable categories. Installation uses this checkout directly and requires no network access or external skill cache. The installer exposes global skills through the flat `~/.agents/skills` directory and writes only the adapter files each harness understands.
 
-Owned skills are global unless their `SKILL.md` front matter contains a `harnesses` include-list. Harness names are case-insensitive. A restricted skill stays in the regular categorized `skills/` tree and declares its targets like this:
+Skills are global unless their `SKILL.md` front matter contains a `harnesses` include-list. Harness names are case-insensitive. A restricted skill stays in the regular categorized `skills/` tree and declares its targets like this:
 
 ```yaml
 ---
@@ -44,7 +44,7 @@ The repository manages global instructions, shared skills, the adversarial revie
 
 Keep the administrator-issued MCP key in `~/.config/opencode/nibomo-mcp-key`, with file permissions `0600`. OpenCode reads this unmanaged credential file when it loads the configuration. The Pi must run Nibomo with local MCP enabled. Connect through Tailscale, then select `Nibomo` in OpenCode or run `opencode --agent Nibomo`. Restart OpenCode after installation.
 
-External sources use exact Git commits. Locally authored skills remain in this repository. `skills/provenance.md` records how each source was classified during the migration.
+Upstream skills are checked into this repository with their reference files and available licenses. Edit them here to customize them. `skills/provenance.md` records upstream URLs, snapshot commits, and local adaptations; the installer does not read it.
 
 Taste Skill, Web Design Guidelines, Awesome Design MD, and Image-to-Code are saved under `skills/ui/` and installed for both harnesses. Awesome Design MD includes the reference library. Their upstream commits and local adaptations are recorded in `skills/provenance.md`.
 
