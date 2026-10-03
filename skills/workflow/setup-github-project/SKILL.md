@@ -1,6 +1,6 @@
 ---
 name: setup-github-project
-description: Set up a GitHub repository with dev as the default PR target and main for releases. Use only when the user explicitly invokes this skill or explicitly asks for this setup workflow.
+description: Set up a GitHub repository with local pre-push checks, PR CI, dev as the default PR target, and main for releases. Use only when the user explicitly invokes this skill or explicitly asks for this setup workflow.
 ---
 
 # Set up a GitHub project
@@ -23,11 +23,22 @@ When the user names a reference project, inspect its README, actual workflows, a
 
 For a new repository, create an initial commit containing only reviewed project files, publish `main` and `dev` from it, set GitHub's default branch to `dev`, and leave the local checkout on `dev` tracking `origin/dev`. This bootstraps the first release when release automation is enabled. For an existing repository, fetch and inspect divergence before changing defaults or creating missing branches.
 
+## Local verification
+
+Use these verification defaults unless the user specifies otherwise. Adapt commands to the project's language and existing build system.
+
+- Track `.githooks/pre-push`, `scripts/install-hooks.sh`, and `scripts/check.sh`. Run the installer in the usual local clone and verify its local `core.hooksPath`. Preserve existing hooks, including pre-commit checks, and respect unrelated hook directories. Linked worktrees share the setting; the configured hook path must remain available.
+- Make `scripts/check.sh` run the full relevant verification: formatting, lint, types, tests, generated-file drift checks, and builds. Include browser checks for web projects and a container build when the project ships a Dockerfile. Missing tools or failed checks must fail the command, rather than silently skipping coverage.
+- Have local checks and GitHub CI call the same verification command. A database-ready mode such as `--ci` may accept an explicitly supplied disposable test database. Local checks must create and clean up their own temporary database, ignore inherited development connection settings, and never use live databases or services.
+- Check the outgoing commit, including annotated tags. Reject dirty checkouts and pushes of commits other than the checked-out HEAD so the verified source matches the push. Skip checks for ref deletions. After verification, reject a push if HEAD or the checkout changed. Never stash, reset, or rewrite the user's work to make a check pass.
+
+Document prerequisites, hook installation, the checks, and deliberate bypass with `git push --no-verify`. Hooks belong to each clone and can be bypassed. They run before a push, which covers the usual push-before-PR flow; Git has no hook for opening or merging a PR on GitHub.
+
 ## CI and release automation
 
-Adapt commands to the project's language and existing build system. Do not transplant a Go workflow into another stack.
+Keep hosted verification within the project's intended budget. For private personal repositories, default to PR checks targeting `dev` or `main`; do not also run the full suite on every feature push or integration-branch push. Add a push check on the integration branch only when checking the merged result is needed. Keep useful hosted CI for public repositories, while avoiding duplicate feature-push and PR runs. For an existing repository without hosted CI, local verification alone is acceptable unless the user requests hosted checks.
 
-CI should run relevant tests, static checks, and a build for PRs targeting `dev` or `main`, and for pushes to `dev`. Validate a container build when the project ships a Dockerfile. Documentation-only jobs may skip expensive checks when path detection is reliable; preserve a useful final check result.
+Reuse verification in release and deployment workflows, for example through `workflow_call`, rather than starting a separate push-CI run for the same event. Keep required release and deployment gates. Cancel superseded verification runs, set job timeouts, cache package-manager dependencies and appropriate compiler outputs, and retain failure reports for seven days unless another retention period is requested. Documentation-only jobs may skip expensive checks when path detection is reliable; preserve a useful final check result. Do not add a self-hosted runner as part of this default setup unless the user requests one.
 
 A push to `main` validates the release, chooses a version, builds release artifacts, and publishes a GitHub release. Serialize release runs without canceling an in-flight publication. Fetch full Git history and tags. Use narrowly scoped job permissions: ordinary CI needs contents read; release publication needs contents write; GHCR publication also needs packages write.
 
@@ -41,7 +52,7 @@ Check referenced action versions against current upstream tags or the working re
 
 Add linked badges immediately below the README title as part of setup:
 
-- CI status, linked to the CI workflow. Scope it to the actual integration-branch run, such as `?branch=dev&event=push`. If CI only runs on PRs, use `?event=pull_request` instead.
+- CI status, linked to the CI workflow when one exists. For the default PR checks, use `?event=pull_request`. If an integration-branch push check is configured, scope its badge to the actual branch and event, such as `?branch=dev&event=push`.
 - Release workflow status, scoped to `?branch=main&event=push` and linked to that workflow. Label it Release; publishing artifacts does not mean the service was deployed.
 - Latest release version, using `https://img.shields.io/github/v/release/OWNER/REPO`, linked to `https://github.com/OWNER/REPO/releases/latest`.
 
@@ -51,8 +62,8 @@ For an existing repository, carry README changes through a normal feature PR int
 
 ## Finish the setup
 
-Document the branch model, promotion method, artifact locations, and versioning rules. Repository release automation does not authorize a production deployment.
+Document local verification and hook installation alongside the branch model, promotion method, artifact locations, and versioning rules. Repository release automation does not authorize a production deployment.
 
-Run local checks appropriate to the new workflows. After pushing, inspect the first CI and release runs and fix setup failures. Check the default branch, tracking branches, merge settings, release assets, and image availability when applicable. Report the repository URL, release URL, branch model, and any remaining blocker.
+Run the verification command and focused checks of the hook's push behavior. After pushing, inspect the first configured CI and release runs and fix setup failures. Check the default branch, tracking branches, merge settings, installed hooks, release assets, and image availability when applicable. If setup used a temporary worktree, reinstall hooks from the usual checkout after merging so they no longer depend on that worktree. Report the repository URL, release URL, branch model, verification setup, and any remaining blocker.
 
 When opening a PR, follow repository instructions for rebasing, title, body, and author signature. Open a real PR rather than a draft when that is the user's convention. Do not invent an exact model identifier if runtime metadata does not expose one.
