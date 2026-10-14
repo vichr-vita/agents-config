@@ -17,6 +17,7 @@ All skills and their supporting files are stored in this repository. This record
 | `rust-skills` | Vendored upstream snapshot | [`leonardomso/rust-skills`](https://github.com/leonardomso/rust-skills/tree/fd2a861ab0406a4ac536a55274d14ea6fd1ca9c9) at `fd2a861ab0406a4ac536a55274d14ea6fd1ca9c9`, including the complete repository snapshot previously installed from the cache |
 | `frontend-design`, `grill-me`, `handoff`, `teach`, `write-a-skill` | Local snapshot | Preserved from the existing harness configuration because no immutable upstream revision was recorded |
 | `home-tailscale-network` | Locally authored | Added by this repository as an optional personal skill |
+| `observability-logging`, `observability-tracing` | Vendored upstream snapshots | [`ci719/opencode-config`](https://github.deutsche-boerse.de/ci719/opencode-config/tree/dd2b692a31ebd86b751025ce66802ff12c4a02d1/skills) at `dd2b692a31ebd86b751025ce66802ff12c4a02d1`, from the matching directories under `skills/`. Imported without changes. |
 | `apple-design` | Vendored skill with local adaptation | [`emilkowalski/skills`](https://github.com/emilkowalski/skills/tree/e8a175de22ae1e49370fc144c1f3bb9aeedf988d/skills/apple-design) at `e8a175de22ae1e49370fc144c1f3bb9aeedf988d`, with the MIT license. Replaced the canned initial response with guidance to follow the requested task and project UI constraints. |
 
 Categories organize this repository only. Installed skill IDs remain flat and come from each skill's directory name.
