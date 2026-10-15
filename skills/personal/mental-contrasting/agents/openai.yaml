@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mental contrasting coach"
+  short_description: "Turn a wish into a practical Vikunja goal project"
+  default_prompt: "Use $mental-contrasting to coach me through a wish and use vikunja-cli to create a Vikunja project with a written plan, concrete tasks, and repeating habits."
