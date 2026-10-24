@@ -59,6 +59,10 @@ Test UI changes with Playwright in CI.
 
 - Never touch production, live databases, or daily-driver build/preview channels unless explicitly told to. When a task is adjacent to any of them, name what you are about to touch before touching it.
 
+# Cloudflare DNS
+
+- Consult the Cloudflare skill and discover current commands with `cf cli search`. The installed `cf` CLI had saved OAuth DNS access on 24 October 2026; verify current authentication and intended zone access with read-only commands before asking for credentials or manual DNS changes. Missing Wrangler configuration or environment tokens do not establish that access is unavailable.
+
 # Pull Requests
 
 - Make sure titles follow conventions from the repo. They should be simple and easy to understand. Conventional commit styles in projects that use them, i.e. "fix(web): new threads no longer spike CPU"
