@@ -42,12 +42,14 @@ Stop and ask only when you can't continue without me, or before anything destruc
 - Always load and apply the `model-routing` skill before spawning any sub-agent, including nested workers and reviewers. Choose the model and reasoning effort for each assignment.
 - Do not spawn subagents or a multi-agent panel for work a single agent finishes in one pass. Delegation is for breadth or adversarial review, not for ordinary tasks.
 - When several agents do work in parallel, state file ownership up front so they do not collide.
+- Implementation workers commit coherent changes within their assigned ownership after meaningful checks. Stage explicit paths, inspect the staged diff, and report commit hashes. Reviewers remain report-only and never commit the implementer's code.
+- Use separate branches and worktrees for concurrent writes when practical, and serialize shared-index operations. Assign a worker an explicit local merge target and commit before merging. Preserve others' edits, honor hooks and checks, and never use broad `git add .`, destructive resets, or force pushes. Routine authorized local commits and merges need no extra approval. Remote merges and protected environments require their own authorization.
 
 # Visual and design work
 
 Test UI changes with Playwright in CI.
 
-- Do not edit real components first. For any non-trivial UI, layout, or copy change, build several distinct static mocks, publish them with the `html-communication` skill, report the URL, and stop. Wait for a pick before implementing.
+- Make UI, layout, and copy decisions autonomously within the requested scope and established design system. Implement and verify them without requiring mocks, generated images, publication, or a user selection first. Use mocks or visual alternatives when the user requests them or when they help resolve a design problem. Ask only when missing information materially affects the outcome or the work exceeds the authorized scope.
 - Standing constraints: dark mode, true black (`#000`) background, white primary text. Information-dense, no decorative card/pill chrome, no light-gray subtitle lines above sections. Minimal copy. No em dashes.
 - Mobile pages and PWAs must fit the viewport without horizontal scrolling, including tables, forms, navigation, and overlays, unless the user explicitly requests it. Wrap or reflow layouts while keeping all content and controls accessible. Do not mask overflow with `overflow-x: hidden` or clipping.
 - Add focused Playwright checks in CI at narrow mobile widths, including WebKit. Check populated screens, long values, and open overlays for horizontal overflow and clipped content.
