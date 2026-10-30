@@ -1,0 +1,4 @@
+interface:
+  display_name: "Director"
+  short_description: "Talk through decisions and delegate work to agents"
+  default_prompt: "Use $director to be my thinking partner and delegate execution to workers while we keep talking."
