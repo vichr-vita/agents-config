@@ -3,6 +3,10 @@
 Use natural, clear prose with complete sentences.
 Apply the `unslop` skill to human-facing writing.
 
+# Repository synchronization
+
+For every Git project with remotes, apply the `repo-sync` skill at `~/.agents/skills/repo-sync/SKILL.md` when starting or resuming authorized work and before finishing it. Safely fetch and integrate remote changes, then commit and push ready work branches so another machine can continue. Preserve unrelated and unfinished edits. Read-only questions do not authorize synchronization.
+
 # Coding preferences - general
 
 - Keep things simple. Channel "yagni" energy unless told otherwise.
