@@ -17,6 +17,11 @@ accomplish. Distinguish using the product from contributing to it. Inspect the
 relevant code, existing docs, and available user questions before drafting.
 Investigate gaps instead of filling them with plausible claims.
 
+Keep product help and diagrams in the reader's task language. Do not turn
+implementation choices or a requested architecture method into product content.
+Retain technical detail in developer documentation and developer tool
+interfaces where the reader needs it.
+
 Choose a page purpose and a clear boundary. For a tutorial, establish the
 starting conditions and a result the reader can recognize. For a reference,
 define which interface and version it covers. Scale the work to the request;
