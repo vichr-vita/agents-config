@@ -5,7 +5,7 @@ description: Synchronize Git work across machines when starting, resuming, or fi
 
 # Repository synchronization
 
-Keep authorized project work available on the remote so another machine can continue it. Apply this workflow at the start or resumption of work and before handing back completed work. Skip repositories without remotes. A read-only question does not authorize checkout changes, integration, commits, or pushes; perform synchronization only when separately requested.
+Keep authorized project work available on the remote so another machine can continue it. Apply this workflow at the start or resumption of work and before handing back completed work. Skip repositories without remotes. A read-only question does not authorize checkout changes, integration, commits, or pushes. For read-only questions, synchronize only when the user also requests it.
 
 ## Start or resume
 
