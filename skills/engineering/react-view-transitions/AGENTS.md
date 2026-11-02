@@ -1,7 +1,6 @@
 # React View Transitions
 
 **Version 1.0.0**
-Vercel Engineering
 
 > **Note:**
 > This standalone guide is compiled from `SKILL.md` and its reference files

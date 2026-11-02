@@ -59,7 +59,3 @@ Escalate Terra to Sol when checks reveal missed dependencies, repeated scope err
 Keep a Sol workflow that already works while trying Terra on a defined task class. Compare representative inputs with the same acceptance criteria and effort, then vary effort separately. Do not launch duplicate assignments solely to benchmark models unless that comparison is part of the task.
 
 Judge cost per accepted task, including failed attempts, tool spend, and review or repair time. Measure elapsed time to verified completion, not just token speed or time to first token. Benchmark scores and token prices do not establish equivalent results or savings for a particular assignment.
-
-## Sources
-
-This replaces `subagent-model-selection` and preserves its model IDs, Astra approval boundary, effort levels, and explicit spawn settings. The routing additions adapt the [EvoLink Terra versus Sol article](https://evolink.ai/blog/gpt-6-1-terra-vs-gpt-6-1-sol), published October 28, 2026, and [OpenAI's model-selection guidance](https://developers.openai.com/api/docs/guides/model-selection), checked November 2, 2026. Benchmark numbers and prices are deliberately omitted because they change.

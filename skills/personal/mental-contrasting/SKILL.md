@@ -7,7 +7,7 @@ description: Coaches a user through mental contrasting and WOOP, then uses vikun
 
 Help the user choose a wish they care about, imagine its outcome, confront what gets in the way, and decide how to act. Keep the resulting coaching document in the Vikunja project description. Support it with actionable tasks and genuinely repeating habits. Use `vikunja-cli` for all Vikunja project and task operations.
 
-Read [the method and sources](references/method.md) before coaching. Read [the document guide](references/project-document.md) when drafting, and [the Vikunja guide](references/vikunja.md) before using Vikunja.
+Read [the method](references/method.md) before coaching. Read [the document guide](references/project-document.md) when drafting, and [the Vikunja guide](references/vikunja.md) before using Vikunja.
 
 ## Coach the person
 

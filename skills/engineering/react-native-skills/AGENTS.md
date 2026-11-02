@@ -1,7 +1,6 @@
 # React Native Skills
 
 **Version 1.0.0**  
-Engineering  
 January 2026
 
 > **Note:**  
@@ -2882,16 +2881,3 @@ function App() {
 After adding fonts to the config plugin, run `npx expo prebuild` and rebuild the
 
 native app.
-
----
-
-## References
-
-1. [https://react.dev](https://react.dev)
-2. [https://reactnative.dev](https://reactnative.dev)
-3. [https://docs.swmansion.com/react-native-reanimated](https://docs.swmansion.com/react-native-reanimated)
-4. [https://docs.swmansion.com/react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler)
-5. [https://docs.expo.dev](https://docs.expo.dev)
-6. [https://legendapp.com/open-source/legend-list](https://legendapp.com/open-source/legend-list)
-7. [https://github.com/nandorojo/galeria](https://github.com/nandorojo/galeria)
-8. [https://zeego.dev](https://zeego.dev)

@@ -1,7 +1,6 @@
 # React Composition Patterns
 
 **Version 1.0.0**  
-Engineering  
 January 2026
 
 > **Note:**  
@@ -936,11 +935,3 @@ const value = use(MyContext)
 ```
 
 `use()` can also be called conditionally, unlike `useContext()`.
-
----
-
-## References
-
-1. [https://react.dev](https://react.dev)
-2. [https://react.dev/learn/passing-data-deeply-with-context](https://react.dev/learn/passing-data-deeply-with-context)
-3. [https://react.dev/reference/react/use](https://react.dev/reference/react/use)

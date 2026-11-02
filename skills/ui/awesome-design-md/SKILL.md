@@ -18,8 +18,6 @@ triggers:
 
 The bundled `design-md/<site>/DESIGN.md` files are available relative to this skill directory. Read the chosen reference before generating a design. Follow the user's instructions and `AGENTS.md` when they differ from a reference. Use these local files before downloading another copy.
 
-> Skill by [ara.so](https://ara.so) — Daily 2026 Skills collection.
-
 A curated collection of `DESIGN.md` files reverse-engineered from 55+ popular developer-focused websites. Drop one into your project root and any AI coding agent instantly understands your target visual style — colors, typography, components, spacing, and more — without Figma exports or JSON schemas.
 
 ---
@@ -511,9 +509,5 @@ git push origin add-newsite-design
 
 ## Links
 
-- **Repo:** https://github.com/VoltAgent/awesome-design-md
 - **DESIGN.md Format Spec:** https://stitch.withgoogle.com/docs/design-md/format/
 - **Google Stitch Overview:** https://stitch.withgoogle.com/docs/design-md/overview/
-- **VoltAgent Framework:** https://github.com/VoltAgent/voltagent
-- **Discord:** https://s.voltagent.dev/discord
-- **License:** MIT

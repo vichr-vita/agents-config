@@ -9,14 +9,7 @@ description: >
   Invoke with /rust-skills.
 license: MIT
 metadata:
-  author: leonardomso
   version: "1.5.1"
-  sources:
-    - Rust API Guidelines
-    - Rust Performance Book
-    - Rust 2024 Edition Guide
-    - The Rustonomicon
-    - ripgrep, tokio, serde, polars, axum, cargo codebases
 ---
 
 # Rust Best Practices
@@ -468,32 +461,3 @@ This skill provides rule identifiers for quick reference. When generating or rev
 | Memory optimization | `mem-`, `own-`, `perf-` |
 | Performance tuning | `opt-`, `mem-`, `perf-` |
 | Code review | `anti-`, `lint-` |
-
----
-
-## Sources & Attribution
-
-This skill is an independent synthesis of official Rust guidance, well-known books, and patterns from widely-used crates. It is not affiliated with or endorsed by the Rust project or any crate author; the text and code examples are original.
-
-**Official Rust documentation**
-- [The Rust Reference](https://doc.rust-lang.org/reference/)
-- [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
-- [The Rustonomicon](https://doc.rust-lang.org/nomicon/) (unsafe code)
-- [Rust 2024 Edition Guide](https://doc.rust-lang.org/edition-guide/rust-2024/)
-- [The Cargo Book](https://doc.rust-lang.org/cargo/)
-- [Standard library docs](https://doc.rust-lang.org/std/) and [release notes](https://doc.rust-lang.org/releases.html)
-
-**Books & guides**
-- [The Rust Performance Book](https://nnethercote.github.io/perf-book/) — Nicholas Nethercote
-- [Rust Design Patterns](https://rust-unofficial.github.io/patterns/) — rust-unofficial
-- [Rust Atomics and Locks](https://marabos.nl/atomics/) — Mara Bos
-- [Effective Rust](https://effective-rust.com/) — David Drysdale
-
-**Tooling**
-- [Clippy lint documentation](https://rust-lang.github.io/rust-clippy/)
-- [Miri](https://github.com/rust-lang/miri)
-
-**Real-world codebases studied for idioms**
-- ripgrep, tokio, serde, clap, polars, axum, cargo, hyper, bevy, rayon, and dtolnay's crates (thiserror, anyhow, syn)
-
-This project is MIT-licensed. Referenced upstream materials remain under their own licenses (the official Rust docs and API Guidelines are dual MIT / Apache-2.0).
