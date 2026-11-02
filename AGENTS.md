@@ -28,6 +28,7 @@ For every Git project with remotes, apply the `repo-sync` skill at `~/.agents/sk
 
 # Match ceremony to the task
 
+- Always load and apply the `model-routing` skill before spawning any sub-agent, including nested workers and reviewers. Choose the model and reasoning effort for each assignment.
 - Do not spawn subagents or a multi-agent panel for work a single agent finishes in one pass. Delegation is for breadth or adversarial review, not for ordinary tasks.
 - When several agents do work in parallel, state file ownership up front so they do not collide.
 
