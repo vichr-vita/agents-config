@@ -36,7 +36,11 @@ Run `./scripts/verify.sh` after installation. Set the `AGENTS_CONFIG_*` home var
 
 ## Managed and local files
 
-The repository manages global instructions, shared skills, the adversarial reviewer, the OpenCode computer-use and Nibomo agents, and OpenCode's model and MCP configuration. It does not manage credentials, sessions, caches, databases, Codex UI settings, trusted hashes, or the rest of `~/.codex/config.toml`.
+The repository manages global instructions, shared skills, the adversarial reviewer, the Codex sysadmin, the OpenCode computer-use and Nibomo agents, and OpenCode's model and MCP configuration. It does not manage credentials, sessions, caches, databases, Codex UI settings, trusted hashes, or the rest of `~/.codex/config.toml`.
+
+### Sysadmin
+
+The Codex `sysadmin` role handles Linux storage, mounts, package caches, services, and system configuration. It inherits the session's model and permissions. It inspects the host, preserves existing data, backs up configuration, and records verification and rollback steps. Formatting, repartitioning, deleting existing data, and rebooting require explicit authorization. Start a new session after installing the role so Codex can discover it. See the [official custom agent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents).
 
 ### Nibomo
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "UX details"
+  short_description: "Check and implement 20 practical UX details"
+  default_prompt: "Use $ux-details to check this app against all 20 UX details, implement the applicable missing ones, and report every outcome."

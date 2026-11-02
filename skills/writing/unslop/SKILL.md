@@ -14,6 +14,19 @@ Edit text to remove AI patterns and add human voice.
 3. Add soul (see next section).
 4. Self-audit: "What makes this obviously AI generated?" Fix remaining tells.
 
+## Product copy
+
+Before finalizing application copy, check UI labels, help, errors, onboarding,
+and diagrams against the intended reader's task. Explain what users can do,
+what happens, and what to do next in the product's domain language. Leave out
+implementation details, technology names, protocols, and code architecture
+unless the reader needs them to complete that task. A framework, tool, or design
+method named in the brief guides the work; it does not become product content. For
+example, C4 need not appear in an app diagram, and "primary/load gate" should
+become an explanation of how the first working set affects progression.
+Technical detail belongs in developer documentation and developer tool
+interfaces when it helps their intended readers.
+
 ## Adding soul
 
 Removing patterns is half the job. Sterile, voiceless writing is just as obvious.
