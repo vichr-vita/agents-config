@@ -3,9 +3,17 @@
 Use natural, clear prose with complete sentences.
 Apply the `unslop` skill to human-facing writing.
 
+# Repository synchronization
+
+For every Git project with remotes, apply the `repo-sync` skill at `~/.agents/skills/repo-sync/SKILL.md` when starting or resuming authorized work and before finishing it. Safely fetch and integrate remote changes, then commit and push ready work branches so another machine can continue. Preserve unrelated and unfinished edits. Read-only questions do not authorize synchronization.
+
 # Coding preferences - general
 
-- Keep things simple. Channel "yagni" energy unless told otherwise.
+- Prefer the simplest solution that meets the current requirements. Do not build for hypothetical future needs. Optimize when measurements or known constraints justify it.
+- Introduce shared abstractions when the code represents the same concept and should change together. A little duplication is better than coupling unrelated behavior.
+- Make failures explicit. Do not swallow errors or return success-shaped defaults that hide a failure. Handle recoverable errors where there is enough context to recover.
+- Remove code and dependencies made obsolete by the current change. Keep unrelated cleanup outside the task's scope.
+- Use names that explain intent and domain meaning. Avoid cryptic abbreviations, redundant wording, and unnecessary verbosity. Follow established project terminology.
 - Typesafety is useful, take advantage of it.
 - Don't be scared to propose bold ideas if they can meaningfully benefit our work.
 - Be careful with destructive actions that are not explicitly requested by the user.

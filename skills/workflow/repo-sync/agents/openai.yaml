@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repository sync"
+  short_description: "Keep work branches synchronized across machines"
+  default_prompt: "Use $repo-sync to synchronize this project and push ready work to its work branch."
