@@ -1,6 +1,7 @@
 ---
 name: ui-implement
-description: Implement or refine a selected UI screenshot, mockup, or saved reference in the current project. Extract design rules, render the real app, inspect screenshots, and iterate on visual differences. Save final PNG previews for review without running the app. Use for explicit image-based implementation or fidelity fixes, not open-ended design ideation.
+description: Implement a selected UI screenshot, mockup, or saved reference in the current project and iterate on visual differences.
+disable-model-invocation: true
 ---
 
 # Implement a UI image

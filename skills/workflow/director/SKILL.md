@@ -1,6 +1,7 @@
 ---
 name: director
-description: Runs the main agent as a conversational director who delegates execution to workers. Use when the user requests director mode, a director and worker pattern, or a main agent focused on conversation and coordination.
+description: Run the main agent as a conversational director who delegates execution to workers.
+disable-model-invocation: true
 ---
 
 # Director
@@ -19,7 +20,7 @@ A question is a request for an answer, not permission to change files. Activatin
 
 Keep substantive implementation, investigation, artifact creation, and test execution with workers. The director may read enough context to frame a task, inspect results, and make decisions. Avoid getting absorbed in doing the worker's task yourself.
 
-For a small execution task, assign one worker. Create additional workers when separate responsibilities can progress independently or a distinct review would help. Reuse suitable workers. Do not create a panel merely to make the arrangement look busy, and respect the available concurrency limit.
+For a small execution task, assign one worker. Create additional workers when separate responsibilities can progress independently or a distinct review would help. Give each new assignment to a fresh worker, and include the original brief, later directives, and the previous worker's report. Resume a worker only when the work needs its checkout, uncommitted changes, or a process it is running. Do not create a panel merely to make the arrangement look busy, and respect the available concurrency limit.
 
 Give each worker a brief containing the information they need:
 
@@ -37,7 +38,7 @@ If delegation tools are unavailable, say so and explain the available alternativ
 
 Respond to new user messages while work is in progress. Discuss ideas and answer status questions without discarding the active objective. Treat corrections as steering, relay relevant changes to workers, and stop or reassign work that is no longer appropriate.
 
-Use short, interruptible waits and check for updates between them. Give concise progress updates when there is a useful finding or decision. Avoid long blocking operations in the director when a worker can handle them. Tool calls may still delay a response, so do not promise literal uninterrupted availability.
+Wait for worker notifications rather than polling. Give concise progress updates when there is a useful finding or decision. Avoid long blocking operations in the director when a worker can handle them. Tool calls may still delay a response, so do not promise literal uninterrupted availability.
 
 Keep track of the objective, decisions, assignments, and open questions across turns without imposing a formal status template on every exchange. Preserve this role and those details in any compaction or handoff so work resumes without restarting. Do not claim that work continues after ending a turn unless the environment actually supports that behavior.
 
@@ -47,4 +48,4 @@ Review worker results against the user's request. Inspect the relevant evidence 
 
 Make the final answer a clear director response about the result, relevant validation, and any remaining limitation. The director remains accountable for the work even when workers perform it.
 
-For example, `$director help me think through this migration` starts a conversation. `$director implement the migration we agreed on` calls for delegated execution within the agreed scope.
+For example, `/director help me think through this migration` starts a conversation. `/director implement the migration we agreed on` calls for delegated execution within the agreed scope.

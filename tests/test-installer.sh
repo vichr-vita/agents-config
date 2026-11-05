@@ -6,9 +6,6 @@ fixture="$(mktemp -d /tmp/agents-config-test.XXXXXX)"
 trap 'rm -rf "$fixture"' EXIT
 export PYTHONDONTWRITEBYTECODE=1
 export AGENTS_CONFIG_CLAUDE_HOME="$fixture/claude"
-export AGENTS_CONFIG_CODEX_HOME="$fixture/codex"
-export AGENTS_CONFIG_OPENCODE_HOME="$fixture/opencode"
-export AGENTS_CONFIG_SHARED_HOME="$fixture/agents"
 export AGENTS_CONFIG_STATE_HOME="$fixture/state"
 export AGENTS_CONFIG_BACKUP_HOME="$fixture/backups"
 
@@ -26,8 +23,8 @@ SH
 chmod +x "$fixture/bin/git"
 export PATH="$fixture/bin:$PATH"
 
-mkdir -p "$AGENTS_CONFIG_CODEX_HOME/agents"
-printf 'unmanaged\n' > "$AGENTS_CONFIG_CODEX_HOME/AGENTS.md"
+mkdir -p "$AGENTS_CONFIG_CLAUDE_HOME/rules"
+printf 'unmanaged\n' > "$AGENTS_CONFIG_CLAUDE_HOME/rules/agents-config.md"
 
 if "$repo_dir/scripts/install.sh" --link >/dev/null 2>&1; then
   echo "installer replaced an unmanaged destination without force" >&2
@@ -38,8 +35,8 @@ fi
 second="$($repo_dir/scripts/install.sh --copy --dry-run)"
 grep -q 'DRY RUN 0 filesystem change(s)' <<<"$second"
 excluded="$($repo_dir/scripts/install.sh --copy --exclude home-tailscale-network --dry-run)"
-grep -q "REMOVE  $AGENTS_CONFIG_SHARED_HOME/skills/home-tailscale-network" <<<"$excluded"
-find "$AGENTS_CONFIG_BACKUP_HOME" -path '*/unmanaged-collisions/*/AGENTS.md' -type f | grep -q .
+grep -q "REMOVE  $AGENTS_CONFIG_CLAUDE_HOME/skills/home-tailscale-network" <<<"$excluded"
+find "$AGENTS_CONFIG_BACKUP_HOME" -path '*/unmanaged-collisions/*/agents-config.md' -type f | grep -q .
 python3 "$repo_dir/tests/test-skill-metadata.py"
 "$repo_dir/scripts/verify.sh" >/dev/null
 
@@ -54,7 +51,7 @@ import sys
 repo = Path(sys.argv[1])
 state_home = Path(os.environ['AGENTS_CONFIG_STATE_HOME'])
 assert not (state_home / 'cache').exists()
-target = Path(os.environ['AGENTS_CONFIG_SHARED_HOME']) / 'skills/research'
+target = Path(os.environ['AGENTS_CONFIG_CLAUDE_HOME']) / 'skills/research'
 legacy_cache = state_home / 'legacy-cache/research'
 shutil.copytree(target, legacy_cache)
 shutil.rmtree(target)
@@ -74,14 +71,11 @@ from pathlib import Path
 import sys
 
 repo = Path(sys.argv[1])
-shared_home = Path(os.environ['AGENTS_CONFIG_SHARED_HOME'])
+claude_home = Path(os.environ['AGENTS_CONFIG_CLAUDE_HOME'])
 for source in (repo / 'skills').glob('*/*/SKILL.md'):
-    target = shared_home / 'skills' / source.parent.name
+    target = claude_home / 'skills' / source.parent.name
     assert target.is_symlink(), target
     assert target.resolve() == source.parent, target
-    claude_target = Path(os.environ['AGENTS_CONFIG_CLAUDE_HOME']) / 'skills' / source.parent.name
-    assert claude_target.is_symlink(), claude_target
-    assert claude_target.resolve() == source.parent, claude_target
 assert not (Path(os.environ['AGENTS_CONFIG_STATE_HOME']) / 'cache').exists()
 PY
 linked="$($repo_dir/scripts/install.sh --link --dry-run)"

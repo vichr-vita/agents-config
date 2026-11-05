@@ -1,22 +1,8 @@
-# Unified agent configuration
+# Claude Code configuration
 
-This repository is the editable source for configuration shared by Claude Code, Codex, and OpenCode.
+This repository is the editable source for global Claude Code instructions, skills, and subagents. Installation uses this checkout directly and needs no network access or external skill cache.
 
-Shared instructions live in `AGENTS.md`. All skills and their supporting files live under `skills/` in human-readable categories. Installation uses this checkout directly and requires no network access or external skill cache. The installer exposes global skills through the flat `~/.agents/skills` directory and writes only the adapter files each harness understands.
-
-Skills are global unless their `SKILL.md` front matter contains a `harnesses` include-list. Harness names are case-insensitive. A restricted skill stays in the regular categorized `skills/` tree and declares its targets like this:
-
-```yaml
----
-name: example
-description: An example Codex-only skill.
-harnesses: [codex]
----
-```
-
-Use any subset of `claude`, `codex`, and `opencode` for a restricted skill. Omitting `harnesses` means all three. Skills for both Codex and OpenCode go in `~/.agents/skills`, Codex-only skills in `~/.codex/skills`, and OpenCode-only skills in `~/.config/opencode/skills`. Claude Code does not read `~/.agents/skills`, so its skills also go in `~/.claude/skills`.
-
-Claude Code receives `AGENTS.md` as `~/.claude/rules/agents-config.md`, which leaves `~/.claude/CLAUDE.md` free for local imports, the adversarial reviewer as `~/.claude/agents/adversarial-reviewer.md`, and the skills. Start a new session after installing so it picks them up. The sysadmin, computer-use, and Nibomo agents are not installed for Claude Code.
+Global instructions live in `AGENTS.md`. Skills live under `skills/` in human-readable categories. Categories organize this repository only; installed skill IDs come from each skill's directory name. Upstream skills are checked in with their reference files and licenses, so edit them here to customize them. `skills/provenance.md` records upstream URLs, snapshot commits, and local adaptations.
 
 ## Install
 
@@ -34,26 +20,36 @@ Use copy mode for a self-contained installation:
 
 Both modes accept repeated `--exclude SKILL` options and `--dry-run`. Copy mode also accepts `--force` when an unmanaged destination should be backed up and replaced.
 
-Run `./scripts/verify.sh` after installation. Set the `AGENTS_CONFIG_*` home variables documented in `scripts/install.sh` to test against temporary directories or install on another machine.
+The installer writes:
+
+- `AGENTS.md` to `~/.claude/rules/agents-config.md`, which leaves `~/.claude/CLAUDE.md` free for local imports.
+- `agents/adversarial-reviewer.md` to `~/.claude/agents/`.
+- Each skill to `~/.claude/skills/`.
+
+It removes any target it previously managed that is no longer in that list. Run `./scripts/verify.sh` after installing and start a new session so Claude Code picks up the changes. Set the `AGENTS_CONFIG_*` variables documented in `scripts/install.sh` to test against temporary directories.
+
+## Checks
+
+`tests/test-skill-metadata.py` and `tests/test-installer.sh` run in CI on pull requests and on pushes to `master`. Run them locally with the same commands.
 
 ## Managed and local files
 
-The repository manages Claude Code, Codex, and OpenCode global instructions, shared skills, the adversarial reviewer, the Codex sysadmin, the OpenCode computer-use and Nibomo agents, and OpenCode's model and MCP configuration. It does not manage credentials, sessions, caches, databases, Codex UI settings, trusted hashes, or the rest of `~/.codex/config.toml`.
+The repository does not manage credentials, sessions, caches, or `~/.claude/settings.json`. Keep machine-specific imports in `~/.claude/CLAUDE.md`.
 
-### Sysadmin
+Instructions are requests, not enforcement. These deny rules back the force-push and hard-reset rules in `~/.claude/settings.json`, and they hold in every permission mode:
 
-The Codex `sysadmin` role handles Linux storage, mounts, package caches, services, and system configuration. It inherits the session's model and permissions. It inspects the host, preserves existing data, backs up configuration, and records verification and rollback steps. Formatting, repartitioning, deleting existing data, and rebooting require explicit authorization. Start a new session after installing the role so Codex can discover it. See the [official custom agent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+```json
+{
+  "permissions": {
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f*)",
+      "Bash(git reset --hard*)"
+    ]
+  }
+}
+```
 
-### Nibomo
-
-`Nibomo` is a primary agent with full tool permissions and access to the private Pi's Nibomo MCP. Other installed agents deny `nibomo_*` tools. Agents that override all permissions with `"*": "allow"` must also end their permission rules with `nibomo_*: deny` unless they are `Nibomo`.
-
-Keep the administrator-issued MCP key in `~/.config/opencode/nibomo-mcp-key`, with file permissions `0600`. OpenCode reads this unmanaged credential file when it loads the configuration. The Pi must run Nibomo with local MCP enabled. Connect through Tailscale, then select `Nibomo` in OpenCode or run `opencode --agent Nibomo`. Restart OpenCode after installation.
-
-Upstream skills are checked into this repository with their reference files and available licenses. Edit them here to customize them. `skills/provenance.md` records upstream URLs, snapshot commits, and local adaptations; the installer does not read it.
-
-Taste Skill, Web Design Guidelines, Awesome Design MD, and Image-to-Code are saved under `skills/ui/` and installed for both harnesses. Awesome Design MD includes the reference library. Their upstream commits and local adaptations are recorded in `skills/provenance.md`.
-
-## Legacy cleanup
-
-`./scripts/cleanup-legacy.sh --dry-run` lists the retired Caveman and Babysitter paths. The cleanup script runs the replacement-layout gate itself, then creates a timestamped archive before removing anything. Run `./scripts/verify.sh` afterward for the final acceptance check.
+A denied command needs you to run it yourself.

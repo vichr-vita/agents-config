@@ -4,11 +4,6 @@ from pathlib import Path
 import re
 
 
-ALL_HARNESSES = frozenset({"claude", "codex", "opencode"})
-# These harnesses both read ~/.agents/skills. Claude Code only reads its own home.
-SHARED_HARNESSES = frozenset({"codex", "opencode"})
-
-
 def _unquote(value: str) -> str:
     value = value.strip()
     if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
@@ -16,37 +11,8 @@ def _unquote(value: str) -> str:
     return value
 
 
-def _parse_harness_name(value: str, skill: Path) -> str:
-    name = _unquote(value).casefold()
-    if name not in ALL_HARNESSES:
-        supported = ", ".join(sorted(ALL_HARNESSES))
-        raise ValueError(f"unsupported harness {value!r} in {skill}; expected one of: {supported}")
-    return name
-
-
-def _parse_harnesses(value: str, following_lines: list[str], skill: Path) -> frozenset[str]:
-    if value:
-        if not (value.startswith("[") and value.endswith("]")):
-            raise ValueError(f"harnesses must be an array in {skill}")
-        items = [item.strip() for item in value[1:-1].split(",") if item.strip()]
-    else:
-        items = []
-        for line in following_lines:
-            if not line.strip() or line.lstrip().startswith("#"):
-                continue
-            match = re.fullmatch(r"\s+-\s+(.+?)\s*", line)
-            if not match:
-                break
-            items.append(match.group(1))
-    harnesses = [_parse_harness_name(item, skill) for item in items]
-    if not harnesses:
-        raise ValueError(f"harnesses must include at least one harness in {skill}")
-    if len(harnesses) != len(set(harnesses)):
-        raise ValueError(f"harnesses contains duplicates in {skill}")
-    return frozenset(harnesses)
-
-
-def read_skill_frontmatter(skill: Path) -> dict[str, str | frozenset[str]]:
+def read_skill_frontmatter(skill: Path) -> dict[str, str]:
+    """Return the top-level scalar keys of a SKILL.md frontmatter block."""
     lines = skill.read_text().splitlines()
     if not lines or lines[0] != "---":
         raise ValueError(f"frontmatter does not start in {skill}")
@@ -55,44 +21,13 @@ def read_skill_frontmatter(skill: Path) -> dict[str, str | frozenset[str]]:
     except ValueError as error:
         raise ValueError(f"frontmatter does not close in {skill}") from error
 
-    values: dict[str, str | frozenset[str]] = {}
-    for index, line in enumerate(lines[1:end], start=1):
+    values: dict[str, str] = {}
+    for line in lines[1:end]:
         match = re.match(r"^([A-Za-z][A-Za-z0-9_-]*):\s*(.*)$", line)
         if not match:
             continue
         key, raw_value = match.groups()
         if key in values:
             raise ValueError(f"duplicate frontmatter key {key!r} in {skill}")
-        if key == "harnesses":
-            values[key] = _parse_harnesses(raw_value, lines[index + 1 : end], skill)
-        else:
-            values[key] = _unquote(raw_value)
+        values[key] = _unquote(raw_value)
     return values
-
-
-def skill_harnesses(skill: Path) -> frozenset[str]:
-    value = read_skill_frontmatter(skill).get("harnesses", ALL_HARNESSES)
-    if not isinstance(value, frozenset):
-        raise ValueError(f"harnesses must be an array in {skill}")
-    return value
-
-
-def skill_install_roots(
-    harnesses: frozenset[str],
-    *,
-    claude_home: Path,
-    codex_home: Path,
-    opencode_home: Path,
-    shared_home: Path,
-) -> list[Path]:
-    """Return every directory a skill must appear in to reach its harnesses."""
-    roots: list[Path] = []
-    if SHARED_HARNESSES <= harnesses:
-        roots.append(shared_home / "skills")
-    elif "codex" in harnesses:
-        roots.append(codex_home / "skills")
-    elif "opencode" in harnesses:
-        roots.append(opencode_home / "skills")
-    if "claude" in harnesses:
-        roots.append(claude_home / "skills")
-    return roots

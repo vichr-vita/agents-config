@@ -1,6 +1,7 @@
 ---
 name: ui-init
-description: Initialize an image-first frontend workflow in an existing project. Create or merge PRODUCT.md, DESIGN.md, reference and preview directories, and a small project-instructions block. Use when explicitly asked to initialize or set up this UI workflow, not to implement or redesign a screen.
+description: Initialize an image-first frontend workflow: PRODUCT.md, DESIGN.md, reference and preview directories, and a project-instructions block.
+disable-model-invocation: true
 ---
 
 # Initialize the UI workflow
@@ -67,5 +68,5 @@ remain intact, and no duplicate block was introduced. If setup is repeated
 without new information, it should cause no material changes.
 
 Report the files created or updated and any unresolved setup constraint. End
-with the next action: attach a selected UI image and invoke `$ui-implement`.
+with the next action: attach a selected UI image and invoke `/ui-implement`.
 Do not start design exploration or implementation during initialization.

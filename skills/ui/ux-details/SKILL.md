@@ -1,13 +1,14 @@
 ---
 name: ux-details
-description: Checks an app against 20 practical UX details and implements applicable missing behavior. Use when the user invokes ux-details or requests this 20-item UX implementation pass.
+description: Check an app against 20 practical UX details and implement the applicable ones that are missing.
+disable-model-invocation: true
 ---
 
 # UX details
 
 Check the app against every detail below. Build each applicable detail that is missing. Skip details that do not fit the project or require backend work unavailable from the current environment.
 
-Invoke with `$ux-details`, optionally naming the app or part of the app to check.
+Invoke with `/ux-details`, optionally naming the app or part of the app to check.
 
 ## Workflow
 

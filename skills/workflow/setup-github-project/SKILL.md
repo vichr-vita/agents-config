@@ -1,11 +1,10 @@
 ---
 name: setup-github-project
-description: Set up a GitHub repository with local pre-push checks, PR CI, dev as the default PR target, and main for releases. Use only when the user explicitly invokes this skill or explicitly asks for this setup workflow.
+description: Set up a GitHub repository with local pre-push checks, PR CI, dev as the default PR target, and main for releases.
+disable-model-invocation: true
 ---
 
 # Set up a GitHub project
-
-Run only on explicit user invocation. Do not select this skill automatically while doing ordinary coding, PR work, or deployment.
 
 ## Establish the target
 

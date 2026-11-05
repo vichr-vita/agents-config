@@ -6,25 +6,13 @@ import json
 import os
 from pathlib import Path
 import re
-import shutil
 import subprocess
 import sys
-import tomllib
 
-from skill_metadata import read_skill_frontmatter, skill_harnesses, skill_install_roots
+from skill_metadata import read_skill_frontmatter
 
 
 REPO = Path(__file__).resolve().parents[2]
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Verify unified agent configuration.")
-    parser.add_argument(
-        "--pre-cleanup",
-        action="store_true",
-        help="verify the replacement layout without requiring retired files to be absent",
-    )
-    return parser.parse_args()
 
 
 def check(condition: bool, message: str) -> None:
@@ -33,12 +21,7 @@ def check(condition: bool, message: str) -> None:
     print(f"PASS    {message}")
 
 
-def strip_jsonc(text: str) -> str:
-    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
-    return re.sub(r"(^|\s)//.*$", r"\1", text, flags=re.M)
-
-
-def frontmatter(skill: Path) -> dict[str, str | frozenset[str]]:
+def frontmatter(skill: Path) -> dict[str, str]:
     label = str(skill.relative_to(REPO)) if skill.is_relative_to(REPO) else str(skill)
     try:
         values = read_skill_frontmatter(skill)
@@ -50,15 +33,7 @@ def frontmatter(skill: Path) -> dict[str, str | frozenset[str]]:
     return values
 
 
-def render(template: Path, prompt: Path) -> str:
-    marker = "{{PROMPT_BODY}}"
-    text = template.read_text()
-    check(text.count(marker) == 1, f"one prompt marker in {template.relative_to(REPO)}")
-    return text.replace(marker, prompt.read_text().rstrip())
-
-
 def main() -> int:
-    args = parse_args()
     skills: dict[str, Path] = {}
     skill_ids: set[str] = set()
     for skill in sorted((REPO / "skills").glob("*/*/SKILL.md")):
@@ -68,31 +43,18 @@ def main() -> int:
         values = frontmatter(skill)
         check(values["name"] not in skill_ids, f"unique skill ID {values['name']}")
         skill_ids.add(values["name"])
+        check("harnesses" not in values, f"no harness include-list in {directory_name}")
+        check(not (skill.parent / "agents/openai.yaml").exists(), f"no Codex metadata in {directory_name}")
 
-    opencode = REPO / "harnesses/opencode/opencode.jsonc"
-    json.loads(strip_jsonc(opencode.read_text()))
-    check(True, "OpenCode JSONC parses")
-    computer_use = REPO / "harnesses/opencode/agents/computer-use.md"
-    check("disable: true" not in computer_use.read_text(), "OpenCode computer-use agent is enabled")
-    prompt = REPO / "agents/adversarial-reviewer.md"
-    codex_rendered = render(REPO / "harnesses/codex/agents/adversarial-reviewer.toml.tmpl", prompt)
-    opencode_rendered = render(REPO / "harnesses/opencode/agents/adversarial-reviewer.md.tmpl", prompt)
-    claude_rendered = render(REPO / "harnesses/claude/agents/adversarial-reviewer.md.tmpl", prompt)
-    tomllib.loads(codex_rendered)
-    check(True, "Codex reviewer TOML parses")
-    sysadmin = tomllib.loads((REPO / "harnesses/codex/agents/sysadmin.toml").read_text())
-    check(sysadmin.get("name") == "sysadmin" and bool(sysadmin.get("description")) and bool(sysadmin.get("developer_instructions")), "Codex sysadmin role parses")
-    check(opencode_rendered.startswith("---\n") and "\n---\n\n" in opencode_rendered, "OpenCode reviewer frontmatter parses")
-    check(claude_rendered.startswith("---\n") and "\n---\n\n" in claude_rendered, "Claude Code reviewer frontmatter parses")
+    reviewer = REPO / "agents/adversarial-reviewer.md"
+    reviewer_text = reviewer.read_text()
+    check(reviewer_text.startswith("---\n") and "\n---\n\n" in reviewer_text, "reviewer frontmatter parses")
     subprocess.run(["bash", "-n", REPO / "scripts/install.sh"], check=True)
-    subprocess.run(["bash", "-n", REPO / "scripts/cleanup-legacy.sh"], check=True)
+    subprocess.run(["bash", "-n", REPO / "scripts/verify.sh"], check=True)
     check(True, "shell entry points parse")
 
     user_home = Path.home()
     claude_home = Path(os.environ.get("AGENTS_CONFIG_CLAUDE_HOME", user_home / ".claude")).expanduser()
-    codex_home = Path(os.environ.get("AGENTS_CONFIG_CODEX_HOME", user_home / ".codex")).expanduser()
-    opencode_home = Path(os.environ.get("AGENTS_CONFIG_OPENCODE_HOME", user_home / ".config/opencode")).expanduser()
-    shared_home = Path(os.environ.get("AGENTS_CONFIG_SHARED_HOME", user_home / ".agents")).expanduser()
     state_home = Path(os.environ.get("AGENTS_CONFIG_STATE_HOME", user_home / ".local/state/agents-config")).expanduser()
     state_file = state_home / "install-state.json"
     if not state_file.exists():
@@ -101,64 +63,15 @@ def main() -> int:
 
     state = json.loads(state_file.read_text())
     check(
-        codex_home.joinpath("AGENTS.md").read_bytes()
-        == opencode_home.joinpath("AGENTS.md").read_bytes()
-        == claude_home.joinpath("rules/agents-config.md").read_bytes(),
-        "global prompts are identical",
+        claude_home.joinpath("rules/agents-config.md").read_bytes() == REPO.joinpath("AGENTS.md").read_bytes(),
+        "global prompt is installed",
     )
-    check(claude_home.joinpath("agents/adversarial-reviewer.md").exists(), "Claude Code reviewer is installed")
-    check(codex_home.joinpath("agents/adversarial-reviewer.toml").exists(), "Codex reviewer is installed")
-    check(codex_home.joinpath("agents/sysadmin.toml").read_bytes() == REPO.joinpath("harnesses/codex/agents/sysadmin.toml").read_bytes(), "Codex sysadmin is installed")
-    check(opencode_home.joinpath("agents/adversarial-reviewer.md").exists(), "OpenCode reviewer is installed")
-    check(opencode_home.joinpath("agents/computer-use.md").exists(), "OpenCode computer-use agent is installed")
-    check(opencode_home.joinpath("agents/Nibomo.md").exists(), "OpenCode Nibomo agent is installed")
-    if not args.pre_cleanup:
-        check(not codex_home.joinpath("agents/implementer.toml").exists(), "retired Codex implementer is absent")
-        check(not codex_home.joinpath("agents/qa.toml").exists(), "retired Codex QA agent is absent")
-    installed_ids: set[tuple[Path, str]] = set()
-    for name, source_skill in skills.items():
+    check(claude_home.joinpath("agents/adversarial-reviewer.md").exists(), "reviewer is installed")
+    for name in skills:
         if name not in state.get("exclusions", []):
-            install_roots = skill_install_roots(
-                skill_harnesses(source_skill),
-                claude_home=claude_home,
-                codex_home=codex_home,
-                opencode_home=opencode_home,
-                shared_home=shared_home,
-            )
-            for install_root in install_roots:
-                installed_skill = install_root / name / "SKILL.md"
-                check(installed_skill.exists(), f"skill is installed {installed_skill}")
-                values = frontmatter(installed_skill)
-                installed_id = (install_root, values["name"])
-                check(installed_id not in installed_ids, f"unique installed skill ID {values['name']} in {install_root}")
-                installed_ids.add(installed_id)
-
-    if not args.pre_cleanup:
-        forbidden_roots = [
-            opencode_home / "commands",
-            opencode_home / "plugins",
-            opencode_home / "skills",
-            shared_home / "plugins/babysitter",
-        ]
-        leftovers = [str(path) for root in forbidden_roots if root.exists() for path in root.rglob("*") if re.search(r"babysitter|caveman", path.name, re.I)]
-        check(not leftovers, "retired OpenCode and local plugin registrations are absent")
-        if shutil.which("codex") and codex_home == user_home / ".codex":
-            marketplace_result = subprocess.run(
-                ["codex", "plugin", "marketplace", "list"],
-                check=False,
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
-            check(not re.search(r"^babysitter\s", marketplace_result.stdout, re.M | re.I), "Babysitter marketplace is absent")
-            plugin_result = subprocess.run(
-                ["codex", "plugin", "list"],
-                check=False,
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
-            check(not re.search(r"^babysitter@babysitter\s+installed", plugin_result.stdout, re.M | re.I), "Babysitter plugin is absent")
+            installed_skill = claude_home / "skills" / name / "SKILL.md"
+            check(installed_skill.exists(), f"skill is installed {installed_skill}")
+            frontmatter(installed_skill)
     print(f"PASS    live state has {len(state['targets'])} managed target(s)")
     return 0
 
@@ -166,6 +79,6 @@ def main() -> int:
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (AssertionError, ValueError, json.JSONDecodeError, tomllib.TOMLDecodeError, subprocess.CalledProcessError) as error:
+    except (AssertionError, ValueError, json.JSONDecodeError, subprocess.CalledProcessError) as error:
         print(f"FAIL    {error}", file=sys.stderr)
         raise SystemExit(1)

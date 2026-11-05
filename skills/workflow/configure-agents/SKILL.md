@@ -1,28 +1,27 @@
 ---
 name: configure-agents
-description: Create, import, or update shared agent skills, instructions, and harness configuration in /home/vichr/projects/agents-config, sync with master, and deploy locally. Use only when the user explicitly invokes configure-agents.
-metadata:
-  opencode/autoinvoke: false
+description: Create, import, or update skills, instructions, and Claude Code configuration in /home/vichr/projects/agents-config, sync with master, and deploy locally.
+disable-model-invocation: true
 ---
 
 # Configure agents
 
-Run only when the user explicitly invokes this skill. Do not select it automatically because a task mentions learning a skill or changing configuration. An invocation with a requested change authorizes that change, its Git synchronization, and its deployment to the local harnesses. An invocation without a requested change needs clarification before editing.
+An invocation with a requested change authorizes that change, its Git synchronization, and its deployment to Claude Code on this machine. An invocation without a requested change needs clarification before editing.
 
 ## Work in the source repository
 
 The source of truth is `/home/vichr/projects/agents-config`, regardless of the project where the user invoked this skill. Use explicit working directories or `git -C` for commands. Read that repository's `AGENTS.md`, `README.md`, and installer before changing anything. Leave the invoking project untouched unless the user separately requests changes there.
 
-Inspect the source repository's status, remotes, branches, and worktrees, then fetch `origin/master`. Use `master` for this workflow even though the general PR instructions mention `main`. Preserve unrelated changes and never stage them into this task's commit.
+Inspect the source repository's status, remotes, branches, and worktrees, then fetch `origin/master`. Preserve unrelated changes and never stage them into this task's commit.
 
 Check `/home/vichr/.local/state/agents-config/install-state.json` for the installed mode and exclusions. Link installations expose edits to linked source files immediately. Draft changes in a separate worktree of this repository when editing linked files or when the usual checkout has conflicting work. Keep that worktree until its changes have reached `master` and deployment succeeds.
 
 ## Make the requested change
 
 - Create or edit skills under `skills/<category>/<skill-name>/`. Include the reference files, scripts, assets, and licenses needed by imported skills. Record upstream sources and local adaptations in `skills/provenance.md` when applicable.
-- Omit `harnesses` for shared skills. Use `harnesses: [codex]` or `harnesses: [opencode]` only for an intentional restriction. Follow the available skill-authoring guidance for new or revised skills.
-- Edit shared instructions in `AGENTS.md`, harness adapters under `harnesses/`, and installation logic under `scripts/` as appropriate. Inspect the installer to determine whether other files are actually managed before editing them.
-- Change managed source files here rather than editing installed files under `~/.agents`, `~/.codex`, or `~/.config/opencode`. Credentials, sessions, caches, databases, and other unmanaged machine settings stay outside the repository. If the request requires an unmanaged setting, explain that boundary before expanding the repository's deployment scope.
+- Call the Skill tool with "writing-for-agents" before writing a new or revised skill.
+- Edit instructions in `AGENTS.md`, subagents under `agents/`, and installation logic under `scripts/` as appropriate. Inspect the installer to determine whether other files are actually managed before editing them.
+- Change managed source files here rather than editing installed files under `~/.claude`. Credentials, sessions, caches, databases, and other unmanaged machine settings stay outside the repository. If the request requires an unmanaged setting, explain that boundary before expanding the repository's deployment scope.
 
 Run `rtk bash tests/test-installer.sh` from the working checkout. It tests copy and link installation and verification in temporary homes without changing the live installation. Validate any new or changed executable behavior with focused checks. Review the diff for unintended files and secrets.
 
@@ -44,4 +43,4 @@ First run `rtk ./scripts/install.sh <mode-and-exclusions> --dry-run`. Name the a
 
 Run `rtk ./scripts/verify.sh` after installation and confirm that changed skills and configuration resolve to the expected source or contain the expected copied bytes. Do not claim deployment succeeded if installation or verification failed. Keep enough context to resume a failed deployment without repeating successful remote publication.
 
-Report the change, the synchronized commit or PR, the installed harnesses, verification results, and any pending action. Mention a restart only when the changed configuration requires it.
+Report the change, the synchronized commit or PR, verification results, and any pending action. Mention a restart only when the changed configuration requires it.

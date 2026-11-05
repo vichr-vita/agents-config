@@ -2,7 +2,6 @@
 name: html-communication
 description: When the user asks for an HTML writeup of work (NOT as part of the codebase), use this skill to create and always upload it to Postplan. Also useful for reading postplan.dev URLs.
 metadata:
-  harness: [codex, opencode]
   platform: [darwin, linux]
   scope: fleet
   requires: "npx (postplan is run via npx)"
