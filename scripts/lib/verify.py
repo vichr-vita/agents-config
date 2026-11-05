@@ -11,7 +11,7 @@ import subprocess
 import sys
 import tomllib
 
-from skill_metadata import read_skill_frontmatter, skill_harnesses, skill_install_root
+from skill_metadata import read_skill_frontmatter, skill_harnesses, skill_install_roots
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -77,16 +77,19 @@ def main() -> int:
     prompt = REPO / "agents/adversarial-reviewer.md"
     codex_rendered = render(REPO / "harnesses/codex/agents/adversarial-reviewer.toml.tmpl", prompt)
     opencode_rendered = render(REPO / "harnesses/opencode/agents/adversarial-reviewer.md.tmpl", prompt)
+    claude_rendered = render(REPO / "harnesses/claude/agents/adversarial-reviewer.md.tmpl", prompt)
     tomllib.loads(codex_rendered)
     check(True, "Codex reviewer TOML parses")
     sysadmin = tomllib.loads((REPO / "harnesses/codex/agents/sysadmin.toml").read_text())
     check(sysadmin.get("name") == "sysadmin" and bool(sysadmin.get("description")) and bool(sysadmin.get("developer_instructions")), "Codex sysadmin role parses")
     check(opencode_rendered.startswith("---\n") and "\n---\n\n" in opencode_rendered, "OpenCode reviewer frontmatter parses")
+    check(claude_rendered.startswith("---\n") and "\n---\n\n" in claude_rendered, "Claude Code reviewer frontmatter parses")
     subprocess.run(["bash", "-n", REPO / "scripts/install.sh"], check=True)
     subprocess.run(["bash", "-n", REPO / "scripts/cleanup-legacy.sh"], check=True)
     check(True, "shell entry points parse")
 
     user_home = Path.home()
+    claude_home = Path(os.environ.get("AGENTS_CONFIG_CLAUDE_HOME", user_home / ".claude")).expanduser()
     codex_home = Path(os.environ.get("AGENTS_CONFIG_CODEX_HOME", user_home / ".codex")).expanduser()
     opencode_home = Path(os.environ.get("AGENTS_CONFIG_OPENCODE_HOME", user_home / ".config/opencode")).expanduser()
     shared_home = Path(os.environ.get("AGENTS_CONFIG_SHARED_HOME", user_home / ".agents")).expanduser()
@@ -97,7 +100,13 @@ def main() -> int:
         return 0
 
     state = json.loads(state_file.read_text())
-    check(codex_home.joinpath("AGENTS.md").read_bytes() == opencode_home.joinpath("AGENTS.md").read_bytes(), "global prompts are identical")
+    check(
+        codex_home.joinpath("AGENTS.md").read_bytes()
+        == opencode_home.joinpath("AGENTS.md").read_bytes()
+        == claude_home.joinpath("CLAUDE.md").read_bytes(),
+        "global prompts are identical",
+    )
+    check(claude_home.joinpath("agents/adversarial-reviewer.md").exists(), "Claude Code reviewer is installed")
     check(codex_home.joinpath("agents/adversarial-reviewer.toml").exists(), "Codex reviewer is installed")
     check(codex_home.joinpath("agents/sysadmin.toml").read_bytes() == REPO.joinpath("harnesses/codex/agents/sysadmin.toml").read_bytes(), "Codex sysadmin is installed")
     check(opencode_home.joinpath("agents/adversarial-reviewer.md").exists(), "OpenCode reviewer is installed")
@@ -106,20 +115,23 @@ def main() -> int:
     if not args.pre_cleanup:
         check(not codex_home.joinpath("agents/implementer.toml").exists(), "retired Codex implementer is absent")
         check(not codex_home.joinpath("agents/qa.toml").exists(), "retired Codex QA agent is absent")
-    installed_ids: set[str] = set()
+    installed_ids: set[tuple[Path, str]] = set()
     for name, source_skill in skills.items():
         if name not in state.get("exclusions", []):
-            install_root = skill_install_root(
+            install_roots = skill_install_roots(
                 skill_harnesses(source_skill),
+                claude_home=claude_home,
                 codex_home=codex_home,
                 opencode_home=opencode_home,
                 shared_home=shared_home,
             )
-            installed_skill = install_root / name / "SKILL.md"
-            check(installed_skill.exists(), f"skill is installed {name}")
-            values = frontmatter(installed_skill)
-            check(values["name"] not in installed_ids, f"unique installed skill ID {values['name']}")
-            installed_ids.add(values["name"])
+            for install_root in install_roots:
+                installed_skill = install_root / name / "SKILL.md"
+                check(installed_skill.exists(), f"skill is installed {installed_skill}")
+                values = frontmatter(installed_skill)
+                installed_id = (install_root, values["name"])
+                check(installed_id not in installed_ids, f"unique installed skill ID {values['name']} in {install_root}")
+                installed_ids.add(installed_id)
 
     if not args.pre_cleanup:
         forbidden_roots = [

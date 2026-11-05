@@ -1,6 +1,6 @@
 # Unified agent configuration
 
-This repository is the editable source for configuration shared by Codex and OpenCode.
+This repository is the editable source for configuration shared by Claude Code, Codex, and OpenCode.
 
 Shared instructions live in `AGENTS.md`. All skills and their supporting files live under `skills/` in human-readable categories. Installation uses this checkout directly and requires no network access or external skill cache. The installer exposes global skills through the flat `~/.agents/skills` directory and writes only the adapter files each harness understands.
 
@@ -14,7 +14,9 @@ harnesses: [codex]
 ---
 ```
 
-Use `[codex]` or `[opencode]` for a restricted skill. `[codex, opencode]` has the same meaning as omitting `harnesses`. The installer puts global skills in `~/.agents/skills`, Codex-only skills in `~/.codex/skills`, and OpenCode-only skills in `~/.config/opencode/skills`.
+Use any subset of `claude`, `codex`, and `opencode` for a restricted skill. Omitting `harnesses` means all three. Skills for both Codex and OpenCode go in `~/.agents/skills`, Codex-only skills in `~/.codex/skills`, and OpenCode-only skills in `~/.config/opencode/skills`. Claude Code does not read `~/.agents/skills`, so its skills also go in `~/.claude/skills`.
+
+Claude Code receives `AGENTS.md` as `~/.claude/CLAUDE.md`, the adversarial reviewer as `~/.claude/agents/adversarial-reviewer.md`, and the skills. Start a new session after installing so it picks them up. The sysadmin, computer-use, and Nibomo agents are not installed for Claude Code.
 
 ## Install
 
@@ -36,7 +38,7 @@ Run `./scripts/verify.sh` after installation. Set the `AGENTS_CONFIG_*` home var
 
 ## Managed and local files
 
-The repository manages global instructions, shared skills, the adversarial reviewer, the Codex sysadmin, the OpenCode computer-use and Nibomo agents, and OpenCode's model and MCP configuration. It does not manage credentials, sessions, caches, databases, Codex UI settings, trusted hashes, or the rest of `~/.codex/config.toml`.
+The repository manages Claude Code, Codex, and OpenCode global instructions, shared skills, the adversarial reviewer, the Codex sysadmin, the OpenCode computer-use and Nibomo agents, and OpenCode's model and MCP configuration. It does not manage credentials, sessions, caches, databases, Codex UI settings, trusted hashes, or the rest of `~/.codex/config.toml`.
 
 ### Sysadmin
 

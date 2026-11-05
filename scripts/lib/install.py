@@ -13,7 +13,7 @@ import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from skill_metadata import skill_harnesses, skill_install_root
+from skill_metadata import skill_harnesses, skill_install_roots
 
 
 REPO = Path(__file__).resolve().parents[2]
@@ -89,7 +89,7 @@ def render(template: Path, prompt: Path) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Install unified Codex and OpenCode configuration.")
+    parser = argparse.ArgumentParser(description="Install unified Claude Code, Codex, and OpenCode configuration.")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--link", action="store_const", const="link", dest="mode")
     mode.add_argument("--copy", action="store_const", const="copy", dest="mode")
@@ -115,12 +115,14 @@ def require_writable(path: Path, label: str) -> None:
 def main() -> int:
     args = parse_args()
     user_home = Path.home()
+    claude_home = Path(os.environ.get("AGENTS_CONFIG_CLAUDE_HOME", user_home / ".claude")).expanduser()
     codex_home = Path(os.environ.get("AGENTS_CONFIG_CODEX_HOME", user_home / ".codex")).expanduser()
     opencode_home = Path(os.environ.get("AGENTS_CONFIG_OPENCODE_HOME", user_home / ".config/opencode")).expanduser()
     shared_home = Path(os.environ.get("AGENTS_CONFIG_SHARED_HOME", user_home / ".agents")).expanduser()
     state_home = Path(os.environ.get("AGENTS_CONFIG_STATE_HOME", user_home / ".local/state/agents-config")).expanduser()
     backup_home = Path(os.environ.get("AGENTS_CONFIG_BACKUP_HOME", user_home / ".agents-config-backups")).expanduser()
     state_file = state_home / "install-state.json"
+    require_writable(claude_home, "Claude Code home")
     require_writable(codex_home, "Codex home")
     require_writable(opencode_home, "OpenCode home")
     require_writable(shared_home, "shared agent home")
@@ -141,6 +143,7 @@ def main() -> int:
 
     revision = run("git", "rev-parse", "HEAD", cwd=REPO, capture=True)
     artifacts: list[Artifact] = [
+        Artifact(claude_home / "CLAUDE.md", REPO / "AGENTS.md", "global-prompt", revision),
         Artifact(codex_home / "AGENTS.md", REPO / "AGENTS.md", "global-prompt", revision),
         Artifact(codex_home / "agents/sysadmin.toml", REPO / "harnesses/codex/agents/sysadmin.toml", "sysadmin", revision),
         Artifact(opencode_home / "AGENTS.md", REPO / "AGENTS.md", "global-prompt", revision),
@@ -158,6 +161,10 @@ def main() -> int:
             state_home / "rendered/opencode/adversarial-reviewer.md",
             render(REPO / "harnesses/opencode/agents/adversarial-reviewer.md.tmpl", REPO / "agents/adversarial-reviewer.md"),
         ),
+        (
+            state_home / "rendered/claude/adversarial-reviewer.md",
+            render(REPO / "harnesses/claude/agents/adversarial-reviewer.md.tmpl", REPO / "agents/adversarial-reviewer.md"),
+        ),
     ]
     if not args.dry_run:
         for rendered_path, content in rendered_sources:
@@ -167,18 +174,21 @@ def main() -> int:
         [
             Artifact(codex_home / "agents/adversarial-reviewer.toml", rendered_sources[0][0], "adversarial-reviewer", revision),
             Artifact(opencode_home / "agents/adversarial-reviewer.md", rendered_sources[1][0], "adversarial-reviewer", revision),
+            Artifact(claude_home / "agents/adversarial-reviewer.md", rendered_sources[2][0], "adversarial-reviewer", revision),
         ]
     )
 
     for name, source in skills.items():
         if name not in exclusions:
-            install_root = skill_install_root(
+            install_roots = skill_install_roots(
                 skill_harnesses(source / "SKILL.md"),
+                claude_home=claude_home,
                 codex_home=codex_home,
                 opencode_home=opencode_home,
                 shared_home=shared_home,
             )
-            artifacts.append(Artifact(install_root / name, source, f"skill:{name}", revision))
+            for install_root in install_roots:
+                artifacts.append(Artifact(install_root / name, source, f"skill:{name}", revision))
 
     previous = {entry["target"]: entry for entry in json.loads(state_file.read_text()).get("targets", [])} if state_file.exists() else {}
     desired_targets = {str(item.target) for item in artifacts}

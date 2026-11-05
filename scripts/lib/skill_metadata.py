@@ -4,7 +4,9 @@ from pathlib import Path
 import re
 
 
-ALL_HARNESSES = frozenset({"codex", "opencode"})
+ALL_HARNESSES = frozenset({"claude", "codex", "opencode"})
+# These harnesses both read ~/.agents/skills. Claude Code only reads its own home.
+SHARED_HARNESSES = frozenset({"codex", "opencode"})
 
 
 def _unquote(value: str) -> str:
@@ -75,17 +77,22 @@ def skill_harnesses(skill: Path) -> frozenset[str]:
     return value
 
 
-def skill_install_root(
+def skill_install_roots(
     harnesses: frozenset[str],
     *,
+    claude_home: Path,
     codex_home: Path,
     opencode_home: Path,
     shared_home: Path,
-) -> Path:
-    if harnesses == ALL_HARNESSES:
-        return shared_home / "skills"
-    if harnesses == {"codex"}:
-        return codex_home / "skills"
-    if harnesses == {"opencode"}:
-        return opencode_home / "skills"
-    raise ValueError(f"unsupported harness selection: {sorted(harnesses)}")
+) -> list[Path]:
+    """Return every directory a skill must appear in to reach its harnesses."""
+    roots: list[Path] = []
+    if SHARED_HARNESSES <= harnesses:
+        roots.append(shared_home / "skills")
+    elif "codex" in harnesses:
+        roots.append(codex_home / "skills")
+    elif "opencode" in harnesses:
+        roots.append(opencode_home / "skills")
+    if "claude" in harnesses:
+        roots.append(claude_home / "skills")
+    return roots

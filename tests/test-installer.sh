@@ -5,6 +5,7 @@ repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 fixture="$(mktemp -d /tmp/agents-config-test.XXXXXX)"
 trap 'rm -rf "$fixture"' EXIT
 export PYTHONDONTWRITEBYTECODE=1
+export AGENTS_CONFIG_CLAUDE_HOME="$fixture/claude"
 export AGENTS_CONFIG_CODEX_HOME="$fixture/codex"
 export AGENTS_CONFIG_OPENCODE_HOME="$fixture/opencode"
 export AGENTS_CONFIG_SHARED_HOME="$fixture/agents"
@@ -78,6 +79,9 @@ for source in (repo / 'skills').glob('*/*/SKILL.md'):
     target = shared_home / 'skills' / source.parent.name
     assert target.is_symlink(), target
     assert target.resolve() == source.parent, target
+    claude_target = Path(os.environ['AGENTS_CONFIG_CLAUDE_HOME']) / 'skills' / source.parent.name
+    assert claude_target.is_symlink(), claude_target
+    assert claude_target.resolve() == source.parent, claude_target
 assert not (Path(os.environ['AGENTS_CONFIG_STATE_HOME']) / 'cache').exists()
 PY
 linked="$($repo_dir/scripts/install.sh --link --dry-run)"
