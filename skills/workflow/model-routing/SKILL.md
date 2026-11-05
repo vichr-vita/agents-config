@@ -9,17 +9,17 @@ Apply this skill before every sub-agent spawn, including spawns by other sub-age
 
 ## Choose the model
 
-Use `claude-sonnet-5` (provider `anthropic`) by default for all assignments, including the Terra-tier cases below. Hermes currently has no separate lighter-weight Claude tier configured for this account, so Sol and Terra tiers both map to the same model; effort level is what should vary between them (see below).
+Use `claude-sonnet-5-5` (provider `anthropic`) by default for all assignments, including the Terra-tier cases below. Hermes currently has no separate lighter-weight Claude tier configured for this account, so Sol and Terra tiers both map to the same model; effort level is what should vary between them (see below).
 
 | Assignment | Starting model |
 | --- | --- |
-| Computer use with a defined outcome, such as entering supplied invoice fields | `claude-sonnet-5` (medium effort) |
-| Localized code fix with a clear reproduction and focused checks | `claude-sonnet-5` (medium effort) |
-| Writing or revising from supplied facts for a defined audience | `claude-sonnet-5` (medium effort) |
-| Recurring analytics answering known questions | `claude-sonnet-5` (medium effort) |
-| Features or refactors across unfamiliar files or connected subsystems | `claude-sonnet-5` (high effort) |
-| Ambiguous debugging, conflicting evidence, or hidden-pattern discovery | `claude-sonnet-5` (high effort) |
-| Other assignments, or tasks where missed dependencies would cause costly rework | `claude-sonnet-5` (high effort) |
+| Computer use with a defined outcome, such as entering supplied invoice fields | `claude-sonnet-5-5` (medium effort) |
+| Localized code fix with a clear reproduction and focused checks | `claude-sonnet-5-5` (medium effort) |
+| Writing or revising from supplied facts for a defined audience | `claude-sonnet-5-5` (medium effort) |
+| Recurring analytics answering known questions | `claude-sonnet-5-5` (medium effort) |
+| Features or refactors across unfamiliar files or connected subsystems | `claude-sonnet-5-5` (high effort) |
+| Ambiguous debugging, conflicting evidence, or hidden-pattern discovery | `claude-sonnet-5-5` (high effort) |
+| Other assignments, or tasks where missed dependencies would cause costly rework | `claude-sonnet-5-5` (high effort) |
 
 Treat `gpt-6.1-sol`, `gpt-6.1-terra`, and `gpt-6-astra` as retired model IDs for this account (the openai-codex ChatGPT-account integration rejects them with HTTP 400). Do not select them. If a future task genuinely needs a different provider/model (e.g. the user explicitly approves trying a Codex or OpenAI model for a specific assignment), ask first and name the concrete reason.
 
