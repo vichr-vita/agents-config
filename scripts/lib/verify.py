@@ -103,7 +103,7 @@ def main() -> int:
     check(
         codex_home.joinpath("AGENTS.md").read_bytes()
         == opencode_home.joinpath("AGENTS.md").read_bytes()
-        == claude_home.joinpath("CLAUDE.md").read_bytes(),
+        == claude_home.joinpath("rules/agents-config.md").read_bytes(),
         "global prompts are identical",
     )
     check(claude_home.joinpath("agents/adversarial-reviewer.md").exists(), "Claude Code reviewer is installed")

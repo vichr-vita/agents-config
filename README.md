@@ -16,7 +16,7 @@ harnesses: [codex]
 
 Use any subset of `claude`, `codex`, and `opencode` for a restricted skill. Omitting `harnesses` means all three. Skills for both Codex and OpenCode go in `~/.agents/skills`, Codex-only skills in `~/.codex/skills`, and OpenCode-only skills in `~/.config/opencode/skills`. Claude Code does not read `~/.agents/skills`, so its skills also go in `~/.claude/skills`.
 
-Claude Code receives `AGENTS.md` as `~/.claude/CLAUDE.md`, the adversarial reviewer as `~/.claude/agents/adversarial-reviewer.md`, and the skills. Start a new session after installing so it picks them up. The sysadmin, computer-use, and Nibomo agents are not installed for Claude Code.
+Claude Code receives `AGENTS.md` as `~/.claude/rules/agents-config.md`, which leaves `~/.claude/CLAUDE.md` free for local imports, the adversarial reviewer as `~/.claude/agents/adversarial-reviewer.md`, and the skills. Start a new session after installing so it picks them up. The sysadmin, computer-use, and Nibomo agents are not installed for Claude Code.
 
 ## Install
 

@@ -143,7 +143,7 @@ def main() -> int:
 
     revision = run("git", "rev-parse", "HEAD", cwd=REPO, capture=True)
     artifacts: list[Artifact] = [
-        Artifact(claude_home / "CLAUDE.md", REPO / "AGENTS.md", "global-prompt", revision),
+        Artifact(claude_home / "rules/agents-config.md", REPO / "AGENTS.md", "global-prompt", revision),
         Artifact(codex_home / "AGENTS.md", REPO / "AGENTS.md", "global-prompt", revision),
         Artifact(codex_home / "agents/sysadmin.toml", REPO / "harnesses/codex/agents/sysadmin.toml", "sysadmin", revision),
         Artifact(opencode_home / "AGENTS.md", REPO / "AGENTS.md", "global-prompt", revision),
