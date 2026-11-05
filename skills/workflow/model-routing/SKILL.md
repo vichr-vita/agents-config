@@ -9,19 +9,19 @@ Apply this skill before every sub-agent spawn, including spawns by other sub-age
 
 ## Choose the model
 
-Use `gpt-6.1-sol` by default. Use `gpt-6.1-terra` for assignments with clear inputs, a bounded outcome, and a practical way to verify completion.
+Use `claude-sonnet-5` (provider `anthropic`) by default for all assignments, including the Terra-tier cases below. Hermes currently has no separate lighter-weight Claude tier configured for this account, so Sol and Terra tiers both map to the same model; effort level is what should vary between them (see below).
 
 | Assignment | Starting model |
 | --- | --- |
-| Computer use with a defined outcome, such as entering supplied invoice fields | `gpt-6.1-terra` |
-| Localized code fix with a clear reproduction and focused checks | `gpt-6.1-terra` |
-| Writing or revising from supplied facts for a defined audience | `gpt-6.1-terra` |
-| Recurring analytics answering known questions | `gpt-6.1-terra` |
-| Features or refactors across unfamiliar files or connected subsystems | `gpt-6.1-sol` |
-| Ambiguous debugging, conflicting evidence, or hidden-pattern discovery | `gpt-6.1-sol` |
-| Other assignments, or tasks where missed dependencies would cause costly rework | `gpt-6.1-sol` |
+| Computer use with a defined outcome, such as entering supplied invoice fields | `claude-sonnet-5` (medium effort) |
+| Localized code fix with a clear reproduction and focused checks | `claude-sonnet-5` (medium effort) |
+| Writing or revising from supplied facts for a defined audience | `claude-sonnet-5` (medium effort) |
+| Recurring analytics answering known questions | `claude-sonnet-5` (medium effort) |
+| Features or refactors across unfamiliar files or connected subsystems | `claude-sonnet-5` (high effort) |
+| Ambiguous debugging, conflicting evidence, or hidden-pattern discovery | `claude-sonnet-5` (high effort) |
+| Other assignments, or tasks where missed dependencies would cause costly rework | `claude-sonnet-5` (high effort) |
 
-Use `gpt-6-astra` only after the user explicitly approves it for the proposed assignment. Ask only when there is a concrete reason to prefer Astra, and explain that reason. Approval applies to that assignment alone.
+Treat `gpt-6.1-sol`, `gpt-6.1-terra`, and `gpt-6-astra` as retired model IDs for this account (the openai-codex ChatGPT-account integration rejects them with HTTP 400). Do not select them. If a future task genuinely needs a different provider/model (e.g. the user explicitly approves trying a Codex or OpenAI model for a specific assignment), ask first and name the concrete reason.
 
 Keep these exact model choices unless the user overrides them. Do not substitute another model or automatically upgrade to a newer one. If the required model is unavailable, report the limitation without silently choosing another model.
 
