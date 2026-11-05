@@ -325,7 +325,3 @@ Always add the reduced motion CSS from [references/css-recipes.md](references/cs
 - **[references/troubleshooting.md](references/troubleshooting.md)** — Symptom-driven debugging and runtime limitations.
 - **[references/css-recipes.md](references/css-recipes.md)** — Ready-to-use CSS animation recipes.
 - **[references/nextjs.md](references/nextjs.md)** — Next.js App Router patterns and Server Component details.
-
-## Full Compiled Document
-
-For the complete guide with all reference files expanded: `AGENTS.md`

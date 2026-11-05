@@ -29,7 +29,7 @@ Keep historical source notes and credits here rather than in skill entrypoints o
 
 Categories organize this repository only. Installed skill IDs remain flat and come from each skill's directory name.
 
-Local attribution cleanup moves source appendices, author metadata, and promotional credits out of skill instructions and compiled guides. The upstream snapshots listed above identify the imported versions before these edits. License files and technical documentation links are preserved.
+Local attribution cleanup moves source appendices, author metadata, and promotional credits out of skill instructions and compiled guides. The upstream snapshots listed above identify the imported versions before these edits. License files and technical documentation links are preserved. Compiled `AGENTS.md` and `CLAUDE.md` copies from upstream are removed because `SKILL.md` and its reference files hold the same content. `awesome-design-md` also drops human install, preview, and contributing sections. `diagnosing-bugs` and `writing-for-agents` replace emphasis-based wording with concrete criteria.
 
 ## Attribution details
 

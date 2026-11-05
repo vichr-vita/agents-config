@@ -23,7 +23,7 @@ Check `/home/vichr/.local/state/agents-config/install-state.json` for the instal
 - Edit instructions in `AGENTS.md`, subagents under `agents/`, and installation logic under `scripts/` as appropriate. Inspect the installer to determine whether other files are actually managed before editing them.
 - Change managed source files here rather than editing installed files under `~/.claude`. Credentials, sessions, caches, databases, and other unmanaged machine settings stay outside the repository. If the request requires an unmanaged setting, explain that boundary before expanding the repository's deployment scope.
 
-Run `rtk bash tests/test-installer.sh` from the working checkout. It tests copy and link installation and verification in temporary homes without changing the live installation. Validate any new or changed executable behavior with focused checks. Review the diff for unintended files and secrets.
+Run `bash tests/test-installer.sh` from the working checkout. It tests copy and link installation and verification in temporary homes without changing the live installation. Validate any new or changed executable behavior with focused checks. Review the diff for unintended files and secrets.
 
 ## Sync with master
 
@@ -39,8 +39,8 @@ Deploy from the usual source checkout after the task's changes reach both local 
 
 Retain the mode and exclusions from the installation state. Use `--link` when no installation state exists. Pass each saved exclusion as `--exclude <skill-name>`, and resolve an exclusion that no longer exists before running the installer.
 
-First run `rtk ./scripts/install.sh <mode-and-exclusions> --dry-run`. Name the actual destination paths that will change, then run the same command without `--dry-run`. This invocation authorizes the requested local deployment. Do not add `--force` to overwrite unmanaged destinations without explicit authorization.
+First run `./scripts/install.sh <mode-and-exclusions> --dry-run`. Name the actual destination paths that will change, then run the same command without `--dry-run`. This invocation authorizes the requested local deployment. Do not add `--force` to overwrite unmanaged destinations without explicit authorization.
 
-Run `rtk ./scripts/verify.sh` after installation and confirm that changed skills and configuration resolve to the expected source or contain the expected copied bytes. Do not claim deployment succeeded if installation or verification failed. Keep enough context to resume a failed deployment without repeating successful remote publication.
+Run `./scripts/verify.sh` after installation and confirm that changed skills and configuration resolve to the expected source or contain the expected copied bytes. Do not claim deployment succeeded if installation or verification failed. Keep enough context to resume a failed deployment without repeating successful remote publication.
 
 Report the change, the synchronized commit or PR, verification results, and any pending action. Mention a restart only when the changed configuration requires it.

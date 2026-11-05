@@ -12,8 +12,8 @@ visual style. Keep setup small and safe to repeat.
 ## 1. Inspect the project
 
 Identify the target project or app root from the user's request and workspace.
-Read applicable project instructions, including AGENTS.md and any active
-AGENTS.override.md. Inspect the README, existing product/design docs, package
+Read applicable project instructions, including CLAUDE.md and AGENTS.md.
+Inspect the README, existing product/design docs, package
 scripts, UI components, styles, and assets as needed. In a monorepo, keep this
 setup scoped to the requested app.
 
@@ -52,9 +52,8 @@ Do not invent reference images or placeholder preview screenshots.
 
 ## 3. Add the frontend instructions once
 
-Merge `assets/AGENTS.fragment.md` into the project's AGENTS.md. If an existing
-AGENTS.override.md is the active instructions file at that location, use that
-file instead so the block is actually read. Do not create a new override file.
+Merge `assets/AGENTS.fragment.md` into the project's CLAUDE.md if one exists,
+and into AGENTS.md otherwise, so the block is actually read.
 
 The markers are `<!-- ui-workflow:start -->` and
 `<!-- ui-workflow:end -->`. If the block exists, update it in place, preserving

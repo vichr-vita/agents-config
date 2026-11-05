@@ -1,7 +1,6 @@
 ---
 name: frontend-design
 description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.
-license: Complete terms in LICENSE.txt
 ---
 
 # Frontend Design
@@ -36,7 +35,9 @@ Then review that plan against the brief before building: if any part of it reads
 
 When writing the code, be careful of structuring your CSS selector specificities. It's easy to generate CSS classes that cancel each other out (especially with a type-based selector like .section and a element-based selector like .cta). This can happen often with paddings/margins between sections.
 
-Try to do a lot of this planning and iteration in your thinking, and only show ideas to the user when you have higher confidence it'll delight them.
+Show ideas to the user once you are confident they will delight them.
+
+Project instructions take precedence over the calibration above, including the required mock review before implementation, black backgrounds, white primary text, mobile viewport constraints, and limits on continuously repainting animations.
 
 ## Restraint and self-critique
 
