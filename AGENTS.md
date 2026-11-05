@@ -26,6 +26,11 @@ For every Git project with remotes, apply the `repo-sync` skill at `~/.agents/sk
 - A question is a request for an answer, not for changes. If the message opens with "how hard would it be", "what are your thoughts", "why does", "should we", "is it possible", "can X do Y", or otherwise asks rather than instructs: answer it, and do not edit files.
 - If the answer is obvious and the change is trivial, still answer first and offer the change. Ask before making it.
 
+# Autonomy
+
+When a step doesn't need my input, keep going. Put status notes in the same message as your next action.
+Stop and ask only when you can't continue without me, or before anything destructive: deleting data, force-pushing, or changing anything outside this repository.
+
 # Match ceremony to the task
 
 - Always load and apply the `model-routing` skill before spawning any sub-agent, including nested workers and reviewers. Choose the model and reasoning effort for each assignment.
