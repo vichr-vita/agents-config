@@ -5,7 +5,7 @@ Apply the `unslop` skill to human-facing writing.
 
 # Repository synchronization
 
-For every Git project with remotes, apply the `repo-sync` skill at `~/.agents/skills/repo-sync/SKILL.md` when starting or resuming authorized work and before finishing it. Safely fetch and integrate remote changes, then commit and push ready work branches so another machine can continue. Preserve unrelated and unfinished edits. Read-only questions do not authorize synchronization.
+For every Git project with remotes, apply the `repo-sync` skill when starting or resuming authorized work and before finishing it. Safely fetch and integrate remote changes, then commit and push ready work branches so another machine can continue. Preserve unrelated and unfinished edits. Read-only questions do not authorize synchronization.
 
 # Coding preferences - general
 
@@ -25,6 +25,12 @@ For every Git project with remotes, apply the `repo-sync` skill at `~/.agents/sk
 
 - A question is a request for an answer, not for changes. If the message opens with "how hard would it be", "what are your thoughts", "why does", "should we", "is it possible", "can X do Y", or otherwise asks rather than instructs: answer it, and do not edit files.
 - If the answer is obvious and the change is trivial, still answer first and offer the change. Ask before making it.
+
+# Evidence
+
+- Before saying work is done, check the real thing: run the feature, read the stored value, or inspect the diff. A green build or a sub-agent's report is not proof.
+- Label each claim as measured, inferred, or a guess. Cite only links and sources you read in this session.
+- Do not hand me a check you could run. If running something would answer a "which approach" question, run it. Keep questions for product and preference calls.
 
 # Autonomy
 
@@ -57,6 +63,4 @@ Test UI changes with Playwright in CI.
 - PR descriptions should aim for simplicity. Open with a minimal, clear description of the problem. Follow up with how you solved it.
 - Add a blurb to the end of the PR description about what model and harness is making the changes. Use the exact model identifier from the runtime metadata, not a broad model description. Read `user.name` from the repository's local Git config first. If it is unset, use the global Git config. Use the first name from that value in the signature format: `<model> on behalf of <first name from git config> via <harness>`
 - Open a real PR, not a draft. Drafts do not get review-bot coverage.
-- Rebase onto latest `main` before opening. Stale branches conflict and waste a review round.
-
-@/Users/vitchrubasik/.codex/RTK.md
+- Update the branch from the default branch before opening. Stale branches conflict and waste a review round. Rebase only if the branch is unpushed. Merge the default branch into a pushed branch.
