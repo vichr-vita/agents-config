@@ -21,6 +21,8 @@ Apply this skill before every sub-agent spawn. It governs model selection when d
 
 Use `opus` at `medium` for anything the table does not cover. Do not use `max` unless the user asks for it.
 
+Never use `claude-sonnet-5` on this account. `sonnet` means `claude-sonnet-5-5`.
+
 Use `fable` only after the user approves it for the proposed assignment. Ask when the same failure has happened twice at `xhigh`, or when there is another concrete reason, and explain that reason. Approval applies to that assignment alone.
 
 Effort names do not mean the same amount of thinking across models. Do not treat Sonnet at higher effort as equal to Opus at lower effort.
