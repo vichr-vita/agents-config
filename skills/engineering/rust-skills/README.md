@@ -111,8 +111,6 @@ The design is built for low token cost and easy auditing:
 - **[`rules/`](./rules)** holds one Markdown file per rule (`<prefix>-<name>.md`). The agent opens only the handful relevant to your code instead of loading all 218 — progressive disclosure keeps context small.
 - **Prefixes** (`own-`, `err-`, `unsafe-`, `async-`, …) map directly to categories, so an agent reviewing async code can pull just `async-`, `conc-`, and `own-` rules.
 
-`CLAUDE.md` and `AGENTS.md` are symlinks to `SKILL.md`, so the same content works across agent conventions.
-
 ## Manual install
 
 If `add-skill` doesn't work for your setup, here's how to install manually:
