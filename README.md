@@ -28,6 +28,18 @@ The installer writes:
 
 It removes any target it previously managed that is no longer in that list. Run `./scripts/verify.sh` after installing and start a new session so Claude Code picks up the changes. Set the `AGENTS_CONFIG_*` variables documented in `scripts/install.sh` to test against temporary directories.
 
+## RTK
+
+[RTK](https://github.com/rtk-ai/rtk) condenses shell output before it reaches Claude Code. The installer does not set it up because the hook lives in `~/.claude/settings.json`, which stays local to each machine. With the `rtk` binary on `PATH`, run this once per machine:
+
+```sh
+rtk init -g --auto-patch
+```
+
+The command adds the `PreToolUse` hook to `settings.json`, keeps your existing settings, and backs up the file to `settings.json.bak`. It also writes `~/.claude/RTK.md` and imports it from `~/.claude/CLAUDE.md`. Start a new session afterward. `./scripts/verify.sh` prints a warning when the hook is missing, and `rtk verify` checks the hook and RTK's filters.
+
+The hook leaves `git push --force` and `git reset --hard` unrewritten, so the deny rules below still match them.
+
 ## Checks
 
 `tests/test-skill-metadata.py` and `tests/test-installer.sh` run in CI on pull requests and on pushes to `master`. Run them locally with the same commands.

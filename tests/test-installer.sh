@@ -81,4 +81,9 @@ PY
 linked="$($repo_dir/scripts/install.sh --link --dry-run)"
 grep -q 'DRY RUN 0 filesystem change(s)' <<<"$linked"
 "$repo_dir/scripts/verify.sh" >/dev/null
+# settings.json is machine-local, so a missing RTK hook warns instead of failing.
+grep -q '^WARN    RTK hook is missing' <<<"$($repo_dir/scripts/verify.sh)"
+printf '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"rtk hook claude"}]}]}}\n' \
+  > "$AGENTS_CONFIG_CLAUDE_HOME/settings.json"
+grep -q '^PASS    RTK hook is registered' <<<"$($repo_dir/scripts/verify.sh)"
 echo "PASS    local copy/link installation, cache migration, collision, idempotence, and exclusion checks"

@@ -33,6 +33,14 @@ def frontmatter(skill: Path) -> dict[str, str]:
     return values
 
 
+def rtk_hook_registered(settings: Path) -> bool:
+    """Report whether the machine-local Claude Code settings run the RTK hook."""
+    if not settings.exists():
+        return False
+    entries = json.loads(settings.read_text()).get("hooks", {}).get("PreToolUse", [])
+    return any(hook.get("command") == "rtk hook claude" for entry in entries for hook in entry.get("hooks", []))
+
+
 def main() -> int:
     skills: dict[str, Path] = {}
     skill_ids: set[str] = set()
@@ -72,6 +80,11 @@ def main() -> int:
             installed_skill = claude_home / "skills" / name / "SKILL.md"
             check(installed_skill.exists(), f"skill is installed {installed_skill}")
             frontmatter(installed_skill)
+    settings = claude_home / "settings.json"
+    if rtk_hook_registered(settings):
+        print("PASS    RTK hook is registered")
+    else:
+        print(f"WARN    RTK hook is missing from {settings}, run: rtk init -g --auto-patch")
     print(f"PASS    live state has {len(state['targets'])} managed target(s)")
     return 0
 
