@@ -44,6 +44,7 @@ Stop and ask only when you can't continue without me, or before anything destruc
 - When several agents do work in parallel, state file ownership up front so they do not collide.
 - Implementation workers commit coherent changes within their assigned ownership after meaningful checks. Stage explicit paths, inspect the staged diff, and report commit hashes. Reviewers remain report-only and never commit the implementer's code.
 - Use separate branches and worktrees for concurrent writes when practical, and serialize shared-index operations. Assign a worker an explicit local merge target and commit before merging. Preserve others' edits, honor hooks and checks, and never use broad `git add .`, destructive resets, or force pushes. Routine authorized local commits and merges need no extra approval. Remote merges and protected environments require their own authorization.
+- When you end a turn while a delegate is still running, make the first line of your message say so, for example: "⏳ Still running: the worker is on the full test suite. I'll continue when it reports." Your turn ending shows the thread as finished, so the first line has to correct that. Do not let the message read as a final summary. Name what is in progress, what it is waiting on, and what you will do next.
 
 # Visual and design work
 
