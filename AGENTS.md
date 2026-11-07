@@ -56,6 +56,13 @@ Test UI changes with Playwright in CI.
 - Add focused Playwright checks in CI at narrow mobile widths, including WebKit. Check populated screens, long values, and open overlays for horizontal overflow and clipped content.
 - Avoid continuously repainting CSS animations (pulse, shimmer, blur, spinners); they peg the GPU on high-refresh displays.
 
+# Temporary files
+
+`/tmp` is a RAM-backed tmpfs with a per-user quota. When it fills, every session's builds and shell output fail.
+
+- Before finishing, delete everything you created in the session scratchpad, except files the user asked for or you linked in your reply. Go marks module cache directories read-only, so run `chmod -R u+w` before removing them.
+- Use the shared package and build caches the environment already configures (`go env`, `npm config get cache`, Cargo's registry), all under `/mnt/hdd/package-cache/users/vichr`. A cache inside the scratchpad is a last resort for when the shared one is unwritable. Say so in your reply, and delete it with the rest of the scratchpad.
+
 # Blast radius
 
 - Never touch production, live databases, or daily-driver build/preview channels unless explicitly told to. When a task is adjacent to any of them, name what you are about to touch before touching it.
