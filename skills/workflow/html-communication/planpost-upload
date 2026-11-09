@@ -1,0 +1,43 @@
+#!/bin/sh
+# Publishes one HTML file to Planpost and prints its URL.
+#
+# Usage: planpost-upload [--new] <file.html>
+#
+# The server keys a draft on this machine's name plus the file's absolute
+# path, so uploading the same file again updates the same URL. --new moves
+# the file to a fresh URL and leaves the old one as it was.
+set -eu
+
+api_url=${PLANPOST_URL:-https://plans.vichr.me}
+token_file=${PLANPOST_TOKEN_FILE:-$HOME/.config/planpost/token}
+
+new=false
+if [ "${1:-}" = "--new" ]; then
+  new=true
+  shift
+fi
+if [ $# -ne 1 ]; then
+  echo "usage: planpost-upload [--new] <file.html>" >&2
+  exit 2
+fi
+file=$1
+
+if [ ! -f "$file" ]; then
+  echo "planpost-upload: $file is not a file" >&2
+  exit 1
+fi
+if [ ! -r "$token_file" ]; then
+  echo "planpost-upload: no upload token at $token_file" >&2
+  exit 1
+fi
+
+absolute_path=$(cd "$(dirname "$file")" && pwd -P)/$(basename "$file")
+
+# The token reaches curl through stdin so it never appears in the process list.
+printf 'header = "Authorization: Bearer %s"\n' "$(cat "$token_file")" |
+  curl --config - --fail-with-body --silent --show-error --max-time 60 \
+    --request PUT --data-binary "@$file" \
+    --header 'Content-Type: text/html; charset=utf-8' \
+    --url-query "source=$(uname -n):$absolute_path" \
+    --url-query "new=$new" \
+    "$api_url/api/drafts"

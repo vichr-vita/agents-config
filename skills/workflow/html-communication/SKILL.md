@@ -1,10 +1,10 @@
 ---
 name: html-communication
-description: When the user asks for an HTML writeup of work (NOT as part of the codebase), use this skill to create and always upload it to Postplan. Also useful for reading postplan.dev URLs.
+description: When the user asks for an HTML writeup of work (NOT as part of the codebase), use this skill to create and always upload it to Planpost. Also useful for reading plans.vichr.me and postplan.dev URLs.
 metadata:
   platform: [darwin, linux]
   scope: fleet
-  requires: "npx (postplan is run via npx)"
+  requires: "curl 7.87 or newer, and the Planpost upload token"
 ---
 
 # HTML communication
@@ -13,19 +13,21 @@ metadata:
 
 Use this skill for any request to produce a readable HTML artifact for a human, whether it is called a plan, a spec, a write-up, findings, a summary, a report, a comparison, or a set of UI mocks. The word "plan" is often absent. What the requests share is a document to read outside the terminal, and a link to open it.
 
-Also use it whenever a user supplies a `postplan.dev` URL to read.
+Also use it whenever a user supplies a `plans.vichr.me` or `postplan.dev` URL to read.
 
 Do **not** use it for HTML that is part of the product being built (app templates, components, marketing pages). This skill is for documents about work, not shipped UI.
 
-## Read a Postplan URL
+## Read a hosted URL
 
-When a user supplies a `postplan.dev` URL, fetch the uploaded HTML immediately with the shell. Do not use web search or a browser to retrieve it.
+Planpost is Vít's own host at `plans.vichr.me`. Older documents live on the third-party `postplan.dev`. Both serve the uploaded HTML at the URL plus `/raw`.
+
+When a user supplies a URL on either host, fetch the HTML immediately with the shell. Do not use web search or a browser to retrieve it.
 
 1. Remove a trailing slash, then append `/raw` unless the URL already ends in `/raw`.
-2. Run `curl --fail --silent --show-error --location --max-time 30 --output /tmp/postplan.html '<raw-url>'`.
-3. Read `/tmp/postplan.html` as the user's artifact and continue the requested task.
+2. Run `curl --fail --silent --show-error --location --max-time 30 --output /tmp/planpost.html '<raw-url>'`.
+3. Read `/tmp/planpost.html` as the user's artifact and continue the requested task.
 
-A web-search refusal is not evidence that Postplan rejected the request. If `curl` fails, report its actual status or network error; do not substitute search results.
+A web-search refusal is not evidence that the host rejected the request. If `curl` fails, report its actual status or network error; do not substitute search results.
 
 ## Document
 
@@ -47,18 +49,20 @@ When the user asks for variants:
 - Render real styled variants, not descriptions.
 - Label them `A`, `B`, `C`... for easy selection.
 - Lay them out for direct comparison.
-- Keep one file across iterations so its Postplan URL stays stable.
+- Keep one file across iterations so its Planpost URL stays stable.
 
 ## Publish
 
 Vít has given standing permission to upload every artifact created or updated with this skill. Upload is required, including in Auto mode. Do not ask for separate permission or stop at the local file.
 
 1. Write the HTML file locally.
-2. Run `npx postplan upload <file path>`.
-3. Report the local path and returned Postplan URL.
+2. Run `planpost-upload <file path>`. The script is in this skill's directory.
+3. Report the local path and the URL the script prints.
 
-Re-upload the same absolute path to update the existing URL. Use `npx postplan upload <file path> --new` only when a new draft is wanted.
+Planpost ties a URL to the machine name and the file's absolute path, so uploading the same path again updates the same URL. Use `planpost-upload --new <file path>` only when a new draft is wanted.
 
-If validation fails, fix the markup and retry. If a scripted upload needs authentication, ask the user to run `postplan auth login`, then retry without removing the requested interactivity.
+Anyone with the URL can read the document. The server stores the file as uploaded and does not validate markup. Its Content-Security-Policy makes the browser block external scripts, network requests, forms, and frames, so a page that relies on them uploads fine and then renders broken.
+
+If the script reports a missing token, ask the user to copy `~/.config/planpost/token` from a machine that has it. Do not fall back to `npx postplan` or any other host. For other failures, report the HTTP status and message the script printed.
 
 Never open a browser or claim the document is hosted before upload succeeds. Do not verify in a browser unless the user asks.
