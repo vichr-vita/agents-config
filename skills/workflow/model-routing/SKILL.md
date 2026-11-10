@@ -8,6 +8,12 @@ user-invocable: false
 
 Apply this skill before every sub-agent spawn. It governs model selection when delegation is already authorized. It does not require delegation or expand the task's scope.
 
+## Roles
+
+The user-facing session runs on Opus. It talks to the user, routes work, and verifies what comes back. It hands Fable-shaped work (see "When to use Fable") to a `fable` subagent rather than doing it itself.
+
+A Fable subagent may orchestrate its own workers. Spawn it as `general-purpose`, because that type has the Agent tool and read-only types such as `Explore` and `Plan` do not. Its brief tells it to load this skill and route its workers by the table's non-Fable rows, so each effort has one Fable. It reports back to the Opus session, which checks the result before telling the user it is done.
+
 ## Choose the model and effort
 
 | Assignment | `model` | `effort` |
