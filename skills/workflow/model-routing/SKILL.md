@@ -8,7 +8,7 @@ user-invocable: false
 
 Apply this skill before every sub-agent spawn. It governs model selection, and git handling for parallel writers, when delegation is already authorized. It does not require delegation or expand the task's scope.
 
-The goal is the cheapest model and effort that completes the assignment well. Judge cost per finished task: a cheap run that has to be redone costs more than the right model the first time. The numbers and sources behind these rules are in [`evidence.md`](evidence.md); read it when a rule seems wrong for a case or when revisiting the rules.
+The goal is the cheapest model and effort that completes the assignment well. Judge cost per finished task: a cheap run that has to be redone costs more than the right model the first time.
 
 ## Roles
 

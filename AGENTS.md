@@ -39,7 +39,7 @@ Stop and ask only when you can't continue without me, or before anything destruc
 
 # Match ceremony to the task
 
-- Load and apply the `model-routing` skill before spawning any sub-agent, including nested workers and reviewers. It sets each assignment's model and effort and the git rules for parallel writers.
+- Load and apply the `model-routing` skill before spawning any sub-agent, including nested workers and reviewers. It sets each assignment's model and effort and the git rules for parallel writers. When the sub-agent runs on an OpenAI model, apply `model-routing-openai` instead.
 - Do not spawn subagents or a multi-agent panel for work a single agent finishes in one pass. Delegation is for breadth or adversarial review.
 - When several agents work in parallel, state file ownership up front so they do not collide.
 - When you end a turn while a delegate is still running, make the first line of your message say so, for example: "⏳ Still running: the worker is on the full test suite. I'll continue when it reports." Your turn ending shows the thread as finished, so the first line has to correct that, and the message must not read as a final summary. Name what is in progress, what it is waiting on, and what you will do next.
