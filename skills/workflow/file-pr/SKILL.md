@@ -9,9 +9,14 @@ Before filing, check whether a PR for this branch already exists. Review the
 diff locally against the base branch to make sure its
 contents match the goal.
 
+Update the branch from the default branch before opening, because stale
+branches conflict and waste a review round. Rebase only if the branch is
+unpushed. Merge the default branch into a pushed branch.
+
 PR titles usually become commit messages, so follow the repository's title
-conventions. Look at recently merged PRs and Git history for examples. Prefer a
-concise, human-readable title that explains why the change matters:
+conventions, including conventional commit style in repositories that use it.
+Look at recently merged PRs and Git history for examples. Prefer a simple,
+human-readable title that explains why the change matters:
 
 BAD
 
@@ -33,10 +38,14 @@ GOOD
 
 > ✅ My "new worktree" default was ignored when starting new threads on existing worktrees. Super unintuitive. Now your preferences always apply.
 
-End the description with the signature from the global Pull Requests rules.
-Include subagent models that wrote part of the change. Add how you verified the
-change. If model identity is unavailable, name the harness without guessing a
-model.
+Add how you verified the change. End the description with a signature naming
+the model and harness that made the change, in the format
+`<model> on behalf of <first name> via <harness>`. Use the exact model
+identifier from the runtime metadata, not a broad model description. Take the
+first name from `user.name` in the repository's local Git config, or from the
+global Git config if the local value is unset. Include subagent models that
+wrote part of the change. If model identity is unavailable, name the harness
+without guessing a model.
 
 Before submission, check the title, description, quotes, and attachments for
 secrets and private details.
