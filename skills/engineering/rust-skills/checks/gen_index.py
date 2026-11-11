@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Generate SKILL.md's priority table + Quick Reference from rules/ and README counts.
+"""Generate INDEX.md's per-category rule list from rules/, and rule counts in SKILL.md and README.
 
 Single source of truth: each rule file's `# id` header, its `> summary` line, and
 the ordered CATEGORIES config below (prefix -> title + impact). Rule order within a
-category is preserved from the current SKILL.md and any new rules are appended.
+category is preserved from the current INDEX.md and any new rules are appended.
 
-  python3 checks/gen_index.py            rewrite SKILL.md + README counts
+  python3 checks/gen_index.py            rewrite INDEX.md + SKILL.md/README counts
   python3 checks/gen_index.py --check    exit 1 if they are out of date (CI)
 """
 import re, sys, pathlib
@@ -14,6 +14,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent
 RULES = ROOT / "rules"
 SKILL = ROOT / "SKILL.md"
+INDEX = ROOT / "INDEX.md"
 README = ROOT / "README.md"
 
 # (prefix, title, impact) in display order
@@ -69,34 +70,32 @@ def build():
     # preserve existing Quick Reference order; append new rules (sorted)
     existing = []
     seen = set()
-    for m in re.finditer(r'rules/([a-z0-9-]+)\.md', SKILL.read_text(encoding="utf-8")):
+    for m in re.finditer(r'rules/([a-z0-9-]+)\.md', INDEX.read_text(encoding="utf-8")):
         if m.group(1) not in seen:
             seen.add(m.group(1)); existing.append(m.group(1))
 
-    table_rows, qr_sections = [], []
+    qr_sections = []
     total = 0
     for i, (prefix, title, impact) in enumerate(CATEGORIES, 1):
         rules = by_prefix.get(prefix, [])
         ordered = [r for r in existing if r in rules] + sorted(r for r in rules if r not in existing)
         total += len(ordered)
-        table_rows.append(f"| {i} | {title} | {impact} | `{prefix}` | {len(ordered)} |")
-        lines = [f"### {i}. {title} ({impact})", ""]
+        lines = [f"## {i}. {title} ({impact})", ""]
         for rid in ordered:
             lines.append(f"- [`{rid}`](rules/{rid}.md) - {summary_of(RULES / f'{rid}.md')}")
         qr_sections.append("\n".join(lines))
 
-    table = ("| Priority | Category | Impact | Prefix | Rules |\n"
-             "|----------|----------|--------|--------|-------|\n"
-             + "\n".join(table_rows))
     quickref = "\n\n".join(qr_sections)
-    return table, quickref, total, len(CATEGORIES)
+    return quickref, total, len(CATEGORIES)
 
-def render_skill(text, table, quickref, total, ncat):
-    text = re.sub(r"(## Rule Categories by Priority\n\n).*?(\n\n---\n\n## Quick Reference)",
-                  lambda m: m.group(1) + table + m.group(2), text, flags=re.S)
-    text = re.sub(r"(## Quick Reference\n\n).*?(\n\n---\n\n## Recommended Cargo\.toml Settings)",
+def render_index(text, quickref):
+    return re.sub(r"(# Rust rule index\n\n[^\n]*\n\n).*?(\n\n## Recommended Cargo\.toml Settings)",
                   lambda m: m.group(1) + quickref + m.group(2), text, flags=re.S)
+
+def render_skill(text, total, ncat):
     text = re.sub(r"\d+ rules across \d+ categories", f"{total} rules across {ncat} categories", text)
+    text = re.sub(r"\d+ rules in \d+ categories", f"{total} rules in {ncat} categories", text)
+    text = re.sub(r"\((\d+) rules, \d+ categories\)", lambda m: f"({total} rules, {ncat} categories)", text)
     return text
 
 def render_readme(text, total, ncat):
@@ -107,12 +106,14 @@ def render_readme(text, total, ncat):
     return text
 
 def main():
-    table, quickref, total, ncat = build()
-    skill_new = render_skill(SKILL.read_text(encoding="utf-8"), table, quickref, total, ncat)
+    quickref, total, ncat = build()
+    index_new = render_index(INDEX.read_text(encoding="utf-8"), quickref)
+    skill_new = render_skill(SKILL.read_text(encoding="utf-8"), total, ncat)
     readme_new = render_readme(README.read_text(encoding="utf-8"), total, ncat)
 
     if "--check" in sys.argv:
         stale = []
+        if index_new != INDEX.read_text(encoding="utf-8"): stale.append("INDEX.md")
         if skill_new != SKILL.read_text(encoding="utf-8"): stale.append("SKILL.md")
         if readme_new != README.read_text(encoding="utf-8"): stale.append("README.md")
         if stale:
@@ -121,6 +122,7 @@ def main():
         print(f"OK: index up to date ({total} rules, {ncat} categories)")
         return
 
+    INDEX.write_text(index_new, encoding="utf-8")
     SKILL.write_text(skill_new, encoding="utf-8")
     README.write_text(readme_new, encoding="utf-8")
     print(f"wrote index: {total} rules across {ncat} categories")
