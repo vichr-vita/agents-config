@@ -6,7 +6,7 @@ user-invocable: false
 
 # Model routing
 
-Apply this skill before every sub-agent spawn. It governs model selection when delegation is already authorized. It does not require delegation or expand the task's scope.
+Apply this skill before every sub-agent spawn. It governs model selection, and git handling for parallel writers, when delegation is already authorized. It does not require delegation or expand the task's scope.
 
 The goal is the cheapest model and effort that completes the assignment well. Judge cost per finished task: a cheap run that has to be redone costs more than the right model the first time. The numbers and sources behind these rules are in [`evidence.md`](evidence.md); read it when a rule seems wrong for a case or when revisiting the rules.
 
@@ -113,6 +113,12 @@ State the selected model, effort, and brief reason in the assignment or progress
 At `low` and `medium`, a smaller model is more likely to skip a check or stop to ask. A sub-agent has nobody to answer, so every brief states what done means, tells it to keep working until then, and tells it to run a real check and stop and report once the work is done and checked.
 
 Fable follows cautious instructions literally. Leave stale warnings out of its briefs, such as an old "never retry" note. When it should restructure code rather than build around it, include this sentence: "This codebase is yours: what it's for and how it's built are your call, and you'll keep building on it."
+
+## Parallel writers
+
+Implementation workers commit coherent changes within their assigned file ownership after meaningful checks. They stage explicit paths, inspect the staged diff, and report commit hashes. Reviewers stay report-only and never commit the implementer's code.
+
+Give concurrent writers separate branches and worktrees when practical, and serialize shared-index operations. Assign each worker an explicit local merge target, and have it commit before merging. Workers preserve others' edits and honor hooks and checks. Never use broad `git add .`, destructive resets, or force pushes. Routine authorized local commits and merges need no extra approval. Remote merges and protected environments require their own authorization.
 
 ## Verify and adjust
 
